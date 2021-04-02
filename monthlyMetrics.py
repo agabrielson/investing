@@ -27,7 +27,7 @@ def monthlyMetric(filename):
     symbols = ['FSMEX', 'FXAIX', 'FNCMX', 'FCNTX', 'VTIVX', 'BFOCX', 'FBNDX', 'FSSNX', 'FBALX', 'FOCPX', 
                      'FBGRX', 'FSLEX', 'FDLSX', 'FSLBX', 'FTRNX', 'FPURX', 'FDGRX', 'FEMKX', 'FBNDX', 'FSRPX',
                      'FNBGX', 'FNORX', 'FBALX', 'FSMAX', 'FDSCX', 'AWTAX', 'FSDPX', 'FFGCX', 'FSPTX', 'FNILX',
-                     'FZROX' ]
+                     'FZROX', 'FSENX', 'FCPVX', 'FSHOX', 'FNARX']
 
     # Sort symbols & remove duplicates
     symbols = sorted(symbols)
