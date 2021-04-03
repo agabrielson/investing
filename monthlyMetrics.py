@@ -34,15 +34,27 @@ def getMetrics(symbol, month):
        
     start = "%4.4d-%2.2d-%2.2d" % (year, month, 1)
     end = "%4.4d-%2.2d-%2.2d" % (year, month+1, 1)
-    newtime_daily = yf.download(symbol, start, end, interval="1m")
+    symDaily = yf.download(symbol, start, end, interval="1m")
 
-    #print(newtime_daily)
-    dayFirst = newtime_daily.iloc[0].Close
-    dayEnd = newtime_daily.iloc[-1].Close
+    #print(symDaily)
+    dayFirst = symDaily.iloc[0].Close
+    dayEnd = symDaily.iloc[-1].Close
 
     dataList = [symbol, dayFirst, dayEnd, dayEnd/dayFirst]    
     return dataList
 
+def sortSymbols(symbols):
+    symbols = sorted(symbols)
+    res = [] 
+    [res.append(symbol) for symbol in symbols if symbol not in res]
+    symbols = res
+    return symbols
+
+def seralizeData(filename, dataList):
+    df = pd.DataFrame (dataList,columns=['Symbol', 'Month Start', 'Month End', 'PERC'])
+    df = df.T
+    #print(df)
+    df.to_excel(filename)
 
 def monthlyMetric(month, filename):
     # Allocate data & define symbols of interest
@@ -54,20 +66,14 @@ def monthlyMetric(month, filename):
     #symbols = ['FSMEX']
 
     # Sort symbols & remove duplicates
-    symbols = sorted(symbols)
-    res = [] 
-    [res.append(symbol) for symbol in symbols if symbol not in res]
-    symbols = res
+    symbols = sortSymbols(symbols)
 
     # lookup data
     for symbol in symbols:
         dataList.append(getMetrics(symbol, month))
 
     #Seralize data
-    df = pd.DataFrame (dataList,columns=['Symbol', 'Month Start', 'Month End', 'PERC'])
-    df = df.T
-    #print(df)
-    df.to_excel(filename)
+    seralizeData(filename, dataList)
 
 if __name__ == "__main__":
     import sys
