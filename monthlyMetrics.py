@@ -24,14 +24,13 @@ import pandas as pd
 from datetime import date
 
 def getMetrics(symbol, month):
-    todays_date = date.today()
-    year = date.today().year
     if month is None:
         month = date.today().month - 1
         
     if isinstance(month, str):
         month = int(month)
        
+    year = date.today().year
     start = "%4.4d-%2.2d-%2.2d" % (year, month, 1)
     end = "%4.4d-%2.2d-%2.2d" % (year, month+1, 1)
     symDaily = yf.download(symbol, start, end, interval="1m")
