@@ -3,6 +3,13 @@
 
 # quartelyMetrics.py
 #
+# Inputs
+#   filename:   spreadsheet to output data, can be left blank
+#
+# Examples
+#   python3 quartelyMetrics.py              -> outputs in quarterlySymbols.xlsx
+#   python3 quartelyMetrics.py data.xlsx    -> outputs in data.xlsx
+#      
 # Rev History:
 #   0.1 - 210303
 #           Initial Functionality
@@ -14,7 +21,7 @@ import pandas as pd
 import datetime as dt
 
 # What should be added?
-# Fund Manager
+#   Fund Manager
 
 def getDate():
     dateTimeList = []
