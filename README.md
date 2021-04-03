@@ -15,5 +15,7 @@ Finding time to keep long term investment research up to date can be difficult. 
 	# monthlyMetrics.py: Collect monthly pricing data for funds of interest. Most pricing services provide limited granularity.
 	# quartelyMetrics.py: Pull longer term data points together that can be extremely time consuming.
 
+Examples are in each python file
+
 ## License
 Distributed under the MIT License. See LICENSE for more information.
