@@ -56,33 +56,30 @@ def seralizeData(filename, dataList):
     df.to_excel(filename)
 
 def monthlyMetric(month, filename):
-    # Allocate data & define symbols of interest
-    dataList = []
+    # Define symbols of interest
     symbols = ['FSMEX', 'FXAIX', 'FNCMX', 'FCNTX', 'VTIVX', 'BFOCX', 'FBNDX', 'FSSNX', 'FBALX', 'FOCPX', 
                 'FBGRX', 'FSLEX', 'FDLSX', 'FSLBX', 'FTRNX', 'FPURX', 'FDGRX', 'FEMKX', 'FBNDX', 'FSRPX',
                 'FNBGX', 'FNORX', 'FBALX', 'FSMAX', 'FDSCX', 'AWTAX', 'FSDPX', 'FFGCX', 'FSPTX', 'FNILX',
                 'FZROX', 'FSENX', 'FCPVX', 'FSHOX', 'FNARX']
     #symbols = ['FSMEX']
 
-    # Sort symbols & remove duplicates
-    symbols = sortSymbols(symbols)
+    symbols = sortSymbols(symbols)      # Sort symbols & remove duplicates
 
-    # lookup data
-    for symbol in symbols:
+    dataList = []                       # Allocate variable name
+    for symbol in symbols:              # Lookup symbols
         dataList.append(getMetrics(symbol, month))
-
-    #Seralize data
-    seralizeData(filename, dataList)
+    
+    seralizeData(filename, dataList)    # Seralize data
 
 if __name__ == "__main__":
     import sys
         
-    month = None
+    month = None                        # month to lookup
     if(len(sys.argv) >= 3):
         month = sys.argv[2]
 
-    filename = 'interestSymbols.xlsx'
+    filename = 'interestSymbols.xlsx'   # File name to seralize data
     if(len(sys.argv) >= 2):
         filename = sys.argv[1]
 
-    monthlyMetric(month, filename)
+    monthlyMetric(month, filename)      # run monthMetrics to collect data
