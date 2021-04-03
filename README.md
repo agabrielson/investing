@@ -17,5 +17,7 @@ Finding time to keep long term investment research up to date can be difficult. 
 
 Examples are in each python file
 
+tracking has a sample spreadsheet used to track data points over multiple months
+
 ## License
 Distributed under the MIT License. See LICENSE for more information.
