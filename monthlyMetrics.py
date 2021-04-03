@@ -3,7 +3,16 @@
 
 # monthlyMetrics.py
 #
-# Notes: Run on the first business day of the month
+# Inputs
+#   filename:   spreadsheet to output data, can be left blank
+#   month:      month to collect data points for, can be left blank
+#
+# Examples
+#   python3 monthlyMetrics.py               -> outputs in interestSymbols.xlsx
+#   python3 monthlyMetrics.py data.xlsx     -> outputs in data.xlsx
+#       Notes: Run after the first business day of the month
+#   python3 monthlyMetrics.py march.xlsx 3
+#       Notes: Collect data for March of this year, outputs in march.xlsx 
 #
 # Rev History:
 #   0.1     210303      Initial Functionality
