@@ -19,5 +19,8 @@ Examples are in each python file
 
 tracking has a sample spreadsheet used to track data points over multiple months
 
+Find all mutual funds grouped in an instition (not all referenced are valid):
+https://www.sec.gov/edgar/searchedgar/mutualsearch.html
+
 ## License
 Distributed under the MIT License. See LICENSE for more information.

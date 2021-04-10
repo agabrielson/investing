@@ -20,6 +20,7 @@
 #   0.2     210403      Added previous month lookup
 #   0.21    210403      Cleaned up code flow for one path
 #   0.25    210405      Added year
+#   0.26    210410      Adding significantly more symbols
 
 import yfinance as yf
 import pandas as pd
@@ -73,24 +74,76 @@ def sortSymbols(symbols):
 
 def seralizeData(filename, dataList):
     df = pd.DataFrame (dataList,columns=['Symbol', 'Month Start', 'Month End', 'PERC'])
-    df = df.T
+    #df = df.T
     #print(df)
     df.to_excel(filename)
 
 def monthlyMetric(filename, month, year):
     # Define symbols of interest
-    symbols = ['FSMEX', 'FXAIX', 'FNCMX', 'FCNTX', 'VTIVX', 'BFOCX', 'FBNDX', 'FSSNX', 'FBALX', 'FOCPX', 
-                'FBGRX', 'FSLEX', 'FDLSX', 'FSLBX', 'FTRNX', 'FPURX', 'FDGRX', 'FEMKX', 'FBNDX', 'FSRPX',
-                'FNBGX', 'FNORX', 'FBALX', 'FSMAX', 'FDSCX', 'AWTAX', 'FSDPX', 'FFGCX', 'FSPTX', 'FNILX',
-                'FZROX', 'FSENX', 'FCPVX', 'FSHOX', 'FNARX']
+    symbols = ['FSAIX','FSCPX','FCYIX','FSDAX','FSDCX','FSELX','FSENX','FSESX','FSLEX','FIDSX','FDFAX',
+            'FDAGX','FDBGX','FDCGX','FDTGX','FDIGX','FIJCX','FSAVX','FSAGX','FGDIX','FGDAX','FGDBX',
+            'FGDCX','FGDTX','FIJDX','FSPHX','FSVLX','FSCGX','FSDPX','FMFAX','FMFBX','FMFCX','FMFTX',
+            'FMFEX','FIJFX','FSPCX','FDLSX','FSHCX','FSMEX','FSLXX','FSRBX','FBMPX','FGJMX','FGKMX',
+            'FGDMX','FGEMX','FGHMX','FSNGX','FNARX','FNINX','FSPFX','FPHAX','FSRPX','FSCSX','FSPTX',
+            'FSTCX','FTUAX','FTUBX','FTUCX','FTUTX','FTUIX','FIJGX','FBIOX','FSRFX','FSUTX','FWRLX',
+            'FSLBX','FBSOX','FSCHX','FDCPX','FSHOX','FIUIX','FRESX','FIRAX','FIRBX','FIRCX','FIRTX',
+            'FIREX','FIRIX','FIKLX','FFERX','FBIDX','FSEVX','FSEMX','FSMAX','FIBAX','FIBIX','FSIVX',
+            'FSIIX','FSPNX','FSPSX','FLBAX','FLBIX','FSBAX','FSBIX','FSTVX','FSTMX','FFSMX','FSKTX',
+            'FSKAX','FUSVX','FUSEX','FXSIX','FXAIX','FCHSX','FJPDX','FATJX','FMRMX','FIJVX','FARNX',
+            'FLCSX','FMCSX','FKMCX','FNCMX','FOHIX','FOHJX','FJACX','FJAKX','FSLCX','FSCRX','FDFIX',
+            'FFCLX','FCLKX','FKICX','FHLFX','FZIPX','FNILX','FZILX','FZROX','FIFNX','FIFWX','FIFOX',
+            'FIFQX','FIFPX','FIFVX','FCFMX','FVCIX','FNKFX','FNIAX','FNIBX','FNICX','FNITX','FINSX',
+            'FZANX','FNIMX','FCNTX','FCNKX','FVWSX','FWWEX','FAMGX','FFPIX','FLCNX','FINPX','FIPAX',
+            'FBIPX','FIPCX','FIPTX','FIPIX','FBNDX','FGBAX','FGBBX','FGBCX','FGBTX','FGBPX','FIKQX',
+            'FHIFX','SPHIX','FSHBX','FSBFX','FBNAX','FBNTX','FANCX','FBNIX','FIKTX','SPGVX','FTHRX',
+            'FSRRX','FSRAX','FSBRX','FCSRX','FSRTX','FSIRX','FRRFX','FIQDX','FSRKX','FBIDX','FUBFX',
+            'FSITX','FXSTX','FXNAX','FIBIX','FIBAX','FUPDX','FUAMX','FLBAX','FLBIX','FNAMX','FNBGX',
+            'FSBAX','FSBIX','FBENX','FUMBX','FTABX','FSDIX','FASDX','FBSDX','FCSDX','FTSDX','FSIDX',
+            'FSDTX','FIQWX','FSLXX','FDYSX','FDASX','FDBSX','FDCSX','FDTSX','FDYIX','FSIGX','FIBFX',
+            'FFCSX','FCSSX','FCSFX','FSGEX','FSIPX','FFIPX','FCBFX','FCBAX','FCCCX','FCBTX','FCBIX',
+            'FIKOX','FCONX','FCNVX','FMLCX','FAMPX','FAMIX','FAVIX','FMIFX','FAMMX','FACIX','FMCFX',
+            'FAPAX','FOMIX','FOCFX','FOMAX','FPMAX','FPADX','FPMIX','FPEMX','FSGDX','FSGGX','FSGSX',
+            'FSGUX','FSMDX','FSTPX','FSCLX','FSCKX','FSSVX','FSSNX','FSSSX','FSSPX','FSRVX','FSRNX',
+            'FRXIX','FSIQX','FSIYX','FIPBX','FIPDX','FCHPX','FSODX','FSWTX','FIOOX','FSIOX','FYBTX',
+            'FYCTX','FYATX','FSUVX','FSKLX','FZFLX','FUQIX','FBLTX','FESIX','FLCPX','FERGX','FIONX',
+            'FUTBX','FGNXX','FFGXX','FSUIX','FSUPX','FSWIX','FSPGX','FLCHX','FLCDX','FLCMX','FLCOX',
+            'FTIUX','FTIPX','FTIGX','FTIHX','FTLTX','FFTTX','FUMIX','FBUIX','FIBUX','FITFX','FLAPX',
+            'FLXRX','FBSTX','FUSTX','FLXSX','FNIDX','FNIYX','FNIRX','FITLX','FENSX','FPNSX','FIMSX',
+            'FAMHX','FAMYX','FNSJX','FNSKX','FNSOX','FNSLX','FIWCX','FSWCX','FMQXX','FNDSX','FNASX',
+            'FNBSX','FJTDX','FSMNX','FSAJX','FSMTX','FHMFX','FHOFX','FGKPX','FIFZX','FMBIX','FSABX',
+            'FMDGX','FIMVX','FECGX','FISVX','FBIIX','FEMVX','FITMX','FQITX','FZOLX','FZOMX','FBALX',
+            'FBAKX','FLPSX','FLPKX','FPURX','FPUKX','FVDFX','FVDKX','FDMLX','FGLLX','FFNPX','FLKSX',
+            'FDVKX','FBKFX','FPKFX','FGVAX','FGVBX','FGECX','FGVTX','FRVIX','FOCPX','FOCKX','FRIFX',
+            'FRINX','FRIOX','FRIQX','FRIRX','FIKMX','FCPGX','FCAGX','FCBGX','FCCGX','FCTGX','FCIGX',
+            'FCPFX','FIDGX','FSTOX','FCPVX','FCVAX','FCVBX','FCVCX','FCVTX','FCVIX','FSVFX','FIKNX',
+            'FBGRX','FBGKX','FBCFX','FBCVX','FDGFX','FDGKX','FGRIX','FGIKX','FIREX','FIRAX','FIRBX',
+            'FIRCX','FIRTX','FIRIX','FLVCX','FLCKX','FSOPX','FSOFX','FSREX','FSRWX','FREDX','FREFX',
+            'FSBDX','FSBEX','FLCLX','FBCGX','FOCSX','FOKFX','FTRNX','FEMKX','FDSCX','FIGRX','FAIDX',
+            'FADDX','FCADX','FTADX','FIADX','FIDKX','FZAIX','FIEUX','FEUFX','FHJUX','FHJWX','FHJTX',
+            'FHJVX','FHJMX','FIQHX','FGBLX','FJPNX','FJPFX','FPJAX','FJPBX','FJPCX','FJPTX','FJPIX',
+            'FIQLX','FJSCX','FLATX','FLFAX','FLFBX','FLFCX','FLFTX','FLFIX','FIQMX','FNORX','FOSFX',
+            'FOSKX','FFOSX','FPBFX','FSEAX','FSEFX','FWWFX','FWAFX','FWBFX','FWCFX','FWTFX','FWIFX',
+            'FIQOX','FISMX','FIASX','FIBSX','FICSX','FTISX','FIXIX','FIQIX','FSCOX','FOPAX','FOPBX',
+            'FOPCX','FOPTX','FOPIX','FIQJX','FIVFX','FICDX','FACNX','FBCNX','FCCNX','FTCNX','FICCX',
+            'FIQEX','FHKCX','FHKAX','FHKBX','FCHKX','FHKTX','FHKIX','FIQFX','FDIVX','FDIKX','FDVFX',
+            'FEMKX','FKEMX','FEQMX','FZEMX','FEDMX','FEMMX','FECMX','FECAX','FIVLX','FIVMX','FIVNX',
+            'FIVOX','FIVPX','FIVQX','FIQKX','FIGFX','FIAGX','FBIGX','FIGCX','FITGX','FIIIX','FZAJX',
+            'FTCEX','FTTEX','FTEIX','FTIEX','FTAEX','FTBEX','FIEZX','FEMEX','FMEAX','FEMBX','FEMCX',
+            'FEMTX','FIEMX','FEMSX','FEMFX','FFGCX','FFGAX','FFGBX','FCGCX','FFGTX','FFGIX','FIQRX',
+            'FIGSX','FFIGX','FINVX','FFVNX','FSTSX','FFSTX','FEDDX','FEDAX','FEDGX','FEDTX','FEDIX',
+            'FIQGX','FTEJX','FTEMX','FTEDX','FTEFX','FTEHX','FIQNX','FGILX','FULTX','FKIDX','FAPCX',
+            'FCNSX','FHKFX','FISZX','FDKFX','FSOSX','FNSTX','FEOPX','AWTAX','VTIVX','BFOCX']
     #symbols = ['FSMEX']
-
+    
     symbols = sortSymbols(symbols)      # Sort symbols & remove duplicates
 
     dataList = []                       # Allocate variable name
     for symbol in symbols:              # Lookup symbols
-        dataList.append(getMetrics(symbol, month, year))
-    
+        try:
+            dataList.append(getMetrics(symbol, month, year))
+        except:
+            dataList.append([symbol])
+
     seralizeData(filename, dataList)    # Seralize data
 
 if __name__ == "__main__":
