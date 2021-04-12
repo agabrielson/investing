@@ -18,6 +18,11 @@
 #
 # Rev History:
 #   0.1     210411      Initial Functionality
+#	0.15	210412		Fixed hardcode bug in getTuble (%)
+#						Fixed yfinance return bug, an extra row with nan...
+
+# bugs
+#	figure out nan for monthly return...	-> ex FSRRX, NRZ; FCYIX, ROP; FIJFX, SHW
 
 import yfinance as yf
 import pandas as pd
@@ -62,7 +67,12 @@ def getMetrics(symbol, month, year):
 		symDaily = yf.download(symbol, start, end, interval="1mo")
 		#print(symDaily)
 		dayFirst = symDaily.iloc[0].Close
+
+		sdLen = len(symDaily)
 		dayEnd = symDaily.iloc[-1].Close
+		if(numpy.isnan(dayEnd)):
+			dayEnd = symDaily.iloc[sdLen-2].Close
+
 		dataList = [symbol, dayFirst, dayEnd, dayEnd/dayFirst]
 	except:
 		dataList = [symbol, " ", " ", " "]
@@ -77,9 +87,11 @@ def getTuple(str):
 	companySymbol = ""
 	fundPerc = ""
 
-	percLoc = re.search("\d+(\.\d\d%|\s\bpercent\b)",str).start()
-	fundPerc = str[percLoc:percLoc+5]
-	str = str[0:percLoc-1]
+	percLocStart = re.search("\d+(\.\d\d%|\s\bpercent\b)",str).start()
+	percLocEnd = str[percLocStart:].find("%")+1
+
+	fundPerc = str[percLocStart:percLocStart+percLocEnd]
+	str = str[0:percLocStart-1]
 
 	li = str.splitlines()
 
@@ -226,7 +238,7 @@ def getHoldings(filename, month, year):
             'FIGSX','FFIGX','FINVX','FFVNX','FSTSX','FFSTX','FEDDX','FEDAX','FEDGX','FEDTX','FEDIX',
             'FIQGX','FTEJX','FTEMX','FTEDX','FTEFX','FTEHX','FIQNX','FGILX','FULTX','FKIDX','FAPCX',
             'FCNSX','FHKFX','FISZX','FDKFX','FSOSX','FNSTX','FEOPX','AWTAX','VTIVX','BFOCX']
-	#symbols = ["FIQJX", "FCSRX", "FSMEX", "FGKPX"]
+	#symbols = ["FSRRX", "FACNX", "FIQJX", "FCSRX", "FSMEX", "FGKPX"]
 
 	symbols = sortSymbols(symbols)      # Sort symbols & remove duplicates
 
