@@ -21,9 +21,6 @@
 #	0.15	210412		Fixed hardcode bug in getTuble (%)
 #						Fixed yfinance return bug, an extra row with nan...
 
-# bugs
-#	figure out nan for monthly return...	-> ex FSRRX, NRZ; FCYIX, ROP; FIJFX, SHW
-
 import yfinance as yf
 import pandas as pd
 import requests
