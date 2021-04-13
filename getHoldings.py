@@ -20,6 +20,7 @@
 #   0.1     210411      Initial Functionality
 #	0.15	210412		Fixed hardcode bug in getTuble (%)
 #						Fixed yfinance return bug, an extra row with nan...
+#	0.16	210413 		General code documentation, clean up, and variable rename for sanity
 
 import yfinance as yf
 import pandas as pd
@@ -29,6 +30,7 @@ import numpy
 from bs4 import BeautifulSoup
 from datetime import date
 
+# Verify month and year are sane
 def startMonthYear(month, year):
 	if year is None:
 		year = date.today().year
@@ -44,6 +46,7 @@ def startMonthYear(month, year):
 
 	return month, year;
 
+# Wrap around month as needed
 def endMonthYear(month, year):
 	month, year = startMonthYear(month, year)
 	month = month + 1
@@ -70,48 +73,45 @@ def getMetrics(symbol, month, year):
 		if(numpy.isnan(dayEnd)):
 			dayEnd = symDaily.iloc[sdLen-2].Close
 
-		dataList = [symbol, dayFirst, dayEnd, dayEnd/dayFirst]
+		metricsList = [symbol, dayFirst, dayEnd, dayEnd/dayFirst]
 	except:
-		dataList = [symbol, " ", " ", " "]
+		metricsList = [symbol, " ", " ", " "]
 	
-	return dataList
+	return metricsList
 
-# Process the holdings tuple
+# Process the specific holdings
 #	(Company, Symbol, Total Net Assets)
 #	Note: Note all symbols are on the exchange...
-def getTuple(str):
-	companyName = ""
-	companySymbol = ""
-	fundPerc = ""
-
+def getSpecificHolding(str):
+	# Locate percent at the end of each holding line
 	percLocStart = re.search("\d+(\.\d\d%|\s\bpercent\b)",str).start()
 	percLocEnd = str[percLocStart:].find("%")+1
 
+	fundPerc = ""
 	fundPerc = str[percLocStart:percLocStart+percLocEnd]
 	str = str[0:percLocStart-1]
 
 	li = str.splitlines()
 
+	companyName = ""
+	companySymbol = ""
 	ctr = 0
 	for ln in li:
 		if (len(ln) > 0) and (ctr == 0):
-			companyName = ln
+			companyName = ln 	# Company/Fund name is never blank
 			ctr = ctr + 1
 		else:
-			companySymbol = ln
+			companySymbol = ln 	# Symbol is often blank...
 
-	companySymbol = companySymbol.replace(" ","")
-	companySymbol = companySymbol.replace(".", "-")
-	tupleOut = [companyName, companySymbol, fundPerc]
+	companySymbol = companySymbol.replace(" ","")	# Eliminate needless symbols
+	companySymbol = companySymbol.replace(".", "-")	# yahoo has a few different characters in lookup
+	holding = [companyName, companySymbol, fundPerc]
 
-	return tupleOut 
+	return holding 
 
 # Put together the holdings list
 #	Make a call to get month return for a given period
 def buildHoldings(reducedStr, month, year):
-	dataList = []
-	deadFund = False
-
 	# Find As Of & last deliminiter (end of table)
 	matchAsOf = reducedStr.find("As of")	# Pull out As of 01/31/2021
 	asOf = reducedStr[matchAsOf:matchAsOf+16]
@@ -122,47 +122,54 @@ def buildHoldings(reducedStr, month, year):
 	# This string has all holdings, need to get individual holdings
 	reducedStr = reducedStr[matchStart:matchAsOf-1]
 
+	holdingsList = []
 	iterCnt = True
 	while iterCnt == True:
-		#percLoc = reducedStr.find("%")
-		try:
+		try:	# Look for the percentage (3rd col)
 			percLoc = re.search("\d+(\.\d\d%|\s\bpercent\b)",reducedStr).start()+5
-		except:
+		except:	# Give if it doesn't exist
 			iterCnt = False
 			break
 
+		# Really give up if it doesn't exist
 		if(type(percLoc) == None) or (percLoc == -1):
 			iterCnt = False
 			break
 
-		substr = reducedStr[0:percLoc+1]
-		tupleOut = getTuple(substr)
-		matchStart = percLoc+2
+		substr = reducedStr[0:percLoc+1] 		# One line from the table
+		holding = getSpecificHolding(substr)	# Extract the 2-3 values
+		matchStart = percLoc+2					# Enable the regex to find the next 'x.xx%'
 		
-		if(len(tupleOut) > 2) and (tupleOut[1].find(".")) and (tupleOut[1].find(" ")):
-			dl = getMetrics(tupleOut[1], month, year)	# look up return for a symbol
-			ytdRtn = dl[3]
-			if ytdRtn != " ":
-				ytdRtnList = ("%.4f" % ytdRtn)
-				ytdRtnStr = " "
-				ytdRtnStr = ytdRtnStr.join(ytdRtnList).replace(" ","")
-				tupleOut += [ytdRtnStr]
+		# With fund symbol information, let's get the 
+		if(len(holding) > 2) and (holding[1].find(".")) and (holding[1].find(" ")):
+			dl = getMetrics(holding[1], month, year)	# look up return for a symbol
+			monthRtn = dl[3]
+			if monthRtn != " ":
+				monthRtnList = ("%.4f" % monthRtn)
+				monthRtnStr = " "
+				monthRtnStr = monthRtnStr.join(monthRtnList).replace(" ","")
+				holding += [monthRtnStr]
 		
 		reducedStr = reducedStr[percLoc+1:matchAsOf-1]
-		dataList.append(tupleOut)
+		holdingsList.append(holding)
 
-	return dataList, asOf, deadFund
+	return holdingsList, asOf
 
 # Make a request and start to reduce the string
+#	We are only interested in the table with holdings information
 def procRequest(page):
 	soup = BeautifulSoup(page.content, 'html.parser')
+	fullPage = soup.get_text();
 
-	text = soup.get_text();
-	x = text.partition('Top 10 Holdings')
-	y = x[2].partition('Distributions')
-	s = y[0]
+	# ident table start
+	tableLoc = fullPage.find('Top 10 Holdings')
+	if(tableLoc == -1):
+		tableLoc = fullPage.find('Top 25 Holdings')
 
-	str = re.sub(r'\n\s*\n', '\n', s, flags=re.MULTILINE)
+	reducedStr = fullPage[tableLoc:]
+
+	#Remove space
+	str = re.sub(r'\n\s*\n', '\n', reducedStr, flags=re.MULTILINE)
 
 	return str
 
@@ -171,8 +178,7 @@ def sortSymbols(symbols):
     symbols = sorted(symbols)
     res = [] 
     [res.append(symbol) for symbol in symbols if symbol not in res]
-    symbols = res
-    return symbols
+    return res
 
 # Write data to the filesystem
 def seralizeData(filename, dataList):
@@ -181,7 +187,6 @@ def seralizeData(filename, dataList):
 
 # Main
 def getHoldings(filename, month, year):
-	dataList = []
 	symbols = ['FSAIX','FSCPX','FCYIX','FSDAX','FSDCX','FSELX','FSENX','FSESX','FSLEX','FIDSX','FDFAX',
             'FDAGX','FDBGX','FDCGX','FDTGX','FDIGX','FIJCX','FSAVX','FSAGX','FGDIX','FGDAX','FGDBX',
             'FGDCX','FGDTX','FIJDX','FSPHX','FSVLX','FSCGX','FSDPX','FMFAX','FMFBX','FMFCX','FMFTX',
@@ -235,41 +240,35 @@ def getHoldings(filename, month, year):
             'FIGSX','FFIGX','FINVX','FFVNX','FSTSX','FFSTX','FEDDX','FEDAX','FEDGX','FEDTX','FEDIX',
             'FIQGX','FTEJX','FTEMX','FTEDX','FTEFX','FTEHX','FIQNX','FGILX','FULTX','FKIDX','FAPCX',
             'FCNSX','FHKFX','FISZX','FDKFX','FSOSX','FNSTX','FEOPX','AWTAX','VTIVX','BFOCX']
-	#symbols = ["FSRRX", "FACNX", "FIQJX", "FCSRX", "FSMEX", "FGKPX"]
+	#symbols = ["FFGIX", "FFGCX", "FSRRX", "FACNX", "FIQJX", "FCSRX", "FSMEX", "FGKPX", "VTIVX"]
 
 	symbols = sortSymbols(symbols)      # Sort symbols & remove duplicates
 
-	firstPass = True	# Set columns at top of spreadsheet
-
 	URL = 'https://www.marketwatch.com/investing/fund/'
+	URLLong = '/holdings'
+
+	symbolsData = [] # prealloc container
+	# top of the spreadsheet
+	symbolsData.append(['Fund','Company Symbol','Total Net Assets','Total Net Assets','Monthly Rtn'])
 	for symbol in symbols:
 		print(symbol)
 		URLSym = URL + symbol
+		#URLSym += URLLong 		#Get top 25 instead of top 10
+		
 		page = requests.get(URLSym)
-		data = " "
-
-		str = procRequest(page)
-		data, asOf, deadFund = buildHoldings(str, month, year)
+		pageProc = procRequest(page)
+		holdings = " "
+		holdings, asOf = buildHoldings(pageProc, month, year)
 		
-		if(deadFund == False):
-			if(firstPass == True):
-				dataList.append(['Fund','Company Symbol','Total Net Assets','Total Net Assets','Monthly Rtn'])
-				firstPass = False
-
-			strList = [symbol] + [asOf]
-			dataList.append(strList)
-			for i in data:
-				try:
-					dataList.append([" "] + i)
-				except:
-					print("getHoldings: Error")
-					print("\t %s" % data)
-					print("\t %s" % i)
-					print("\t %s" % type(i))
-		else:
-			dataList.append([symbol])
+		strList = [symbol] + [asOf]
+		symbolsData.append(strList)
+		for i in holdings:
+			try:
+				symbolsData.append([" "] + i)
+			except:
+				print("getHoldings: Error")
 		
-	seralizeData(filename, dataList)
+	seralizeData(filename, symbolsData)
 
 if __name__ == "__main__":
     import sys
