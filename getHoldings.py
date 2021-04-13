@@ -263,10 +263,7 @@ def getHoldings(filename, month, year):
 		strList = [symbol] + [asOf]
 		symbolsData.append(strList)
 		for i in holdings:
-			try:
-				symbolsData.append([" "] + i)
-			except:
-				print("getHoldings: Error")
+			symbolsData.append([" "] + i)
 		
 	seralizeData(filename, symbolsData)
 
