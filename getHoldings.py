@@ -239,7 +239,12 @@ def getHoldings(filename, month, year):
             'FEMTX','FIEMX','FEMSX','FEMFX','FFGCX','FFGAX','FFGBX','FCGCX','FFGTX','FFGIX','FIQRX',
             'FIGSX','FFIGX','FINVX','FFVNX','FSTSX','FFSTX','FEDDX','FEDAX','FEDGX','FEDTX','FEDIX',
             'FIQGX','FTEJX','FTEMX','FTEDX','FTEFX','FTEHX','FIQNX','FGILX','FULTX','FKIDX','FAPCX',
-            'FCNSX','FHKFX','FISZX','FDKFX','FSOSX','FNSTX','FEOPX','AWTAX','VTIVX','BFOCX']
+            'FCNSX','FHKFX','FISZX','FDKFX','FSOSX','FNSTX','FEOPX','FDCAX','FCAKX','FDEQX','FDEKX',
+            'FDEFX','FTQGX','FDSCX','FCDAX','FCDBX','FCDCX','FCDTX','FCDIX','FSSZX','FDSSX','FSSKX',
+            'FMAMX','FHRLX','FLACX','FSJHX','FBRNX','FZAPX','FDVLX','FVLKX','FCUTX','FDSVX','FGDKX',
+            'FFTYX','FFIDX','FFDKX','FGRTX','FGTAX','FGRBX','FGRCX','FTGRX','FTRIX','FZALX','FEDCX',
+            'FEDFX','FGLGX','FTBTX','FMALX','FSEDX','FLGEX','FLVEX','FLCEX','FIENX','FMEIX','FCPEX',
+            'FVSAX','AWTAX','VTIVX','BFOCX']
 	#symbols = ["FFGIX", "FFGCX", "FSRRX", "FACNX", "FIQJX", "FCSRX", "FSMEX", "FGKPX", "VTIVX"]
 
 	symbols = sortSymbols(symbols)      # Sort symbols & remove duplicates
