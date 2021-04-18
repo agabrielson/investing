@@ -22,36 +22,12 @@
 #   0.21    210403      Cleaned up code flow for one path
 #   0.25    210405      Added year
 #   0.26    210410      Adding significantly more symbols
+#   0.3     210418      Cleaning up code significantly
 
 import yfinance as yf
-import pandas as pd
-from datetime import date
 
 from interestingFunds import interestingFunds
-
-def startMonthYear(month, year):
-    if year is None:
-        year = date.today().year
-
-    if isinstance(year, str):
-        year = int(year)
-
-    if month is None:
-        month = date.today().month - 1
-        
-    if isinstance(month, str):
-        month = int(month)
-    
-    return month, year;
-
-def endMonthYear(month, year):
-    month, year = startMonthYear(month, year)
-    month = month + 1
-    if month == 13:
-        month = 1
-        year = year + 1
-
-    return month, year;
+from InvestingBase import startMonthYear, endMonthYear, sortSymbols, seralizeData
 
 def getMetrics(symbol, month, year):
     month, year = startMonthYear(month, year)
@@ -68,19 +44,6 @@ def getMetrics(symbol, month, year):
     dataList = [symbol, dayFirst, dayEnd, dayEnd/dayFirst]    
     return dataList
 
-def sortSymbols(symbols):
-    symbols = sorted(symbols)
-    res = [] 
-    [res.append(symbol) for symbol in symbols if symbol not in res]
-    symbols = res
-    return symbols
-
-def seralizeData(filename, dataList):
-    df = pd.DataFrame (dataList,columns=['Symbol', 'Month Start', 'Month End', 'PERC'])
-    #df = df.T
-    #print(df)
-    df.to_excel(filename)
-
 def monthlyMetric(filename, month, year):
     symbols = interestingFunds()        # Get symbols of interest
     #symbols = ['FSMEX']
@@ -94,7 +57,8 @@ def monthlyMetric(filename, month, year):
         except:
             dataList.append([symbol])
 
-    seralizeData(filename, dataList)    # Seralize data
+    cols = ['Symbol', 'Month Start', 'Month End', 'PERC']
+    seralizeData(filename, dataList, cols)    # Seralize data
 
 if __name__ == "__main__":
     import sys
@@ -107,7 +71,7 @@ if __name__ == "__main__":
     if(len(sys.argv) >= 3):
         month = sys.argv[2]
 
-    filename = 'interestSymbols.xlsx'   # File name to seralize data
+    filename = 'monthlySymbols.xlsx'   # File name to seralize data
     if(len(sys.argv) >= 2):
         filename = sys.argv[1]
 

@@ -11,27 +11,22 @@
 #   python3 quartelyMetrics.py data.xlsx    -> outputs in data.xlsx
 #      
 # Rev History:
-#   0.1 - 210303
-#           Initial Functionality
-#           Yahoo ytdReturn appears mistaken at times
-#           Would like to add Fund Manager
-#   0.15 - 210410
-#           Adding significantly more symbols
+#   0.1     210303
+#               Initial Functionality
+#               Yahoo ytdReturn appears mistaken at times
+#               Would like to add Fund Manager
+#   0.15    210410
+#               Adding significantly more symbols
+#   0.2     210418      
+#               Cleaning up code significantly
 
 import yfinance as yf
-import pandas as pd
-import datetime as dt
 
 from interestingFunds import interestingFunds
+from InvestingBase import getDate, sortSymbols, seralizeData
 
 # What should be added?
 #   Fund Manager
-
-def getDate():
-    dateTimeList = []
-    today = dt.date.today()
-    dateTimeList.append(today)
-    return dateTimeList[0]
 
 def getQuarterlyMetrics(symbol):
     sym = yf.Ticker(symbol)
@@ -80,11 +75,10 @@ def quarterlyMetric(filename):
             dataList.append([dateToday, symbol])
 
     #Seralize data
-    df = pd.DataFrame (dataList,columns=['Date', 'Symbol', 'Long Name', 'Peer Group', 'Morningstar',
-                                        'Exp Ratio', 'YTD Return(?!)', 'beta3', 'Total Assets ($M)',
-                                        'Turnover'])
-    #print(df)
-    df.to_excel(filename)
+    cols = ['Date', 'Symbol', 'Long Name', 'Peer Group', 'Morningstar',
+            'Exp Ratio', 'YTD Return(?!)', 'beta3', 'Total Assets ($M)',
+            'Turnover']
+    seralizeData(filename, dataList, cols)    # Seralize data
 
 if __name__ == "__main__":
         import sys

@@ -21,42 +21,16 @@
 #	0.15	210412		Fixed hardcode bug in getTuble (%)
 #						Fixed yfinance return bug, an extra row with nan...
 #	0.16	210413 		General code documentation, clean up, and variable rename for sanity
+#   0.2     210418      Cleaning up code significantly
 
 import yfinance as yf
-import pandas as pd
 import requests
 import re 
 import numpy
 from bs4 import BeautifulSoup
-from datetime import date
 
 from interestingFunds import interestingFunds
-
-# Verify month and year are sane
-def startMonthYear(month, year):
-	if year is None:
-		year = date.today().year
-
-	if isinstance(year, str):
-		year = int(year)
-
-	if month is None:
-		month = date.today().month - 1
-
-	if isinstance(month, str):
-		month = int(month)
-
-	return month, year;
-
-# Wrap around month as needed
-def endMonthYear(month, year):
-	month, year = startMonthYear(month, year)
-	month = month + 1
-	if month == 13:
-		month = 1
-		year = year + 1
-
-	return month, year;
+from InvestingBase import startMonthYear, endMonthYear, sortSymbols, seralizeData
 
 # Try to figure out the monthly return for a symbol
 def getMetrics(symbol, month, year):
@@ -174,18 +148,6 @@ def procRequest(page):
 	str = re.sub(r'\n\s*\n', '\n', reducedStr, flags=re.MULTILINE)
 
 	return str
-
-# Deduplicate symbols and sort them
-def sortSymbols(symbols):
-    symbols = sorted(symbols)
-    res = [] 
-    [res.append(symbol) for symbol in symbols if symbol not in res]
-    return res
-
-# Write data to the filesystem
-def seralizeData(filename, dataList):
-	df = pd.DataFrame(dataList)
-	df.to_excel(filename)
 
 # Main
 def getHoldings(filename, month, year):
