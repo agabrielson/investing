@@ -12,6 +12,8 @@ Finding time to keep long term investment research up to date can be difficult. 
 	1. pandas: container to hold data before generating a spreadsheet
 	1. BeautifulSoup: Scrape a few web pages
 
+Requirements.txt can help setup faster
+
 ## Usage
 	# monthlyMetrics.py: Collect monthly pricing data for funds of interest. Most pricing services provide limited granularity.
 	# quartelyMetrics.py: Pull longer term data points together that can be extremely time consuming.
