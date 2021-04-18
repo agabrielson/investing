@@ -118,6 +118,7 @@ def quarterlyMetric(filename):
             'FFTYX','FFIDX','FFDKX','FGRTX','FGTAX','FGRBX','FGRCX','FTGRX','FTRIX','FZALX','FEDCX',
             'FEDFX','FGLGX','FTBTX','FMALX','FSEDX','FLGEX','FLVEX','FLCEX','FIENX','FMEIX','FCPEX',
             'FVSAX','AWTAX','VTIVX','BFOCX']
+    #symbols = ['FSMEX']
 
     # Sort symbols & remove duplicates
     symbols = sorted(symbols)
