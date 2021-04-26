@@ -17,11 +17,11 @@
 #   python3 getHoldings.py dec2020.xlsx 12 2020
 #
 # Rev History:
-#   0.1     210411      Initial Functionality
+#	0.1     210411      Initial Functionality
 #	0.15	210412		Fixed hardcode bug in getTuble (%)
 #						Fixed yfinance return bug, an extra row with nan...
 #	0.16	210413 		General code documentation, clean up, and variable rename for sanity
-#   0.2     210418      Cleaning up code significantly
+#	0.2     210418      Cleaning up code significantly
 #	0.3		210425		Look up holdings symbols once
 #						Fixed a bug with symbol names (<=2 were skipped)
 #						Disabled yf progress on screen
