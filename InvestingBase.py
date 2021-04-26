@@ -27,7 +27,7 @@ def procRequest(URLSym, iter = 5):
     page = requests.get(URLSym)
     
     # If the webpage is having issues, try again...
-    if(page.status_code != 200):
+    if(page.ok == False):
     	print("URL Failed... Trying again")
     	time.sleep(0.2)
     	return procRequest(URLSym, iter-1)
