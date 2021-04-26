@@ -23,6 +23,7 @@
 #   0.25    210405      Added year
 #   0.26    210410      Adding significantly more symbols
 #   0.3     210418      Cleaning up code significantly
+#   0.31    210425      Cleaning up display
 
 import yfinance as yf
 
@@ -35,7 +36,8 @@ def getMetrics(symbol, month, year):
 
     start = "%4.4d-%2.2d-%2.2d" % (year, month, 1)
     end = "%4.4d-%2.2d-%2.2d" % (yearEnd, monthEnd, 1)
-    symDaily = yf.download(symbol, start, end, interval="1m")
+    print(symbol)
+    symDaily = yf.download(symbol, start, end, interval="1m",progress=False)
 
     #print(symDaily)
     dayFirst = symDaily.iloc[0].Close
