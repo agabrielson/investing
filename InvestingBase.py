@@ -3,6 +3,7 @@
 
 # InvestingBase.py
 #
+# Rev History:
 #   0.1     210418      New file - cleaning up similar code
 
 from datetime import date

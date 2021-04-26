@@ -24,27 +24,11 @@
 #   0.26    210410      Adding significantly more symbols
 #   0.3     210418      Cleaning up code significantly
 #   0.31    210425      Cleaning up display
-
-import yfinance as yf
+#   0.32    210425      InvestingMetrics - moved getMetrics
 
 from interestingFunds import interestingFunds
-from InvestingBase import startMonthYear, endMonthYear, sortSymbols, seralizeData
-
-def getMetrics(symbol, month, year):
-    month, year = startMonthYear(month, year)
-    monthEnd, yearEnd = endMonthYear(month, year)
-
-    start = "%4.4d-%2.2d-%2.2d" % (year, month, 1)
-    end = "%4.4d-%2.2d-%2.2d" % (yearEnd, monthEnd, 1)
-    print(symbol)
-    symDaily = yf.download(symbol, start, end, interval="1m",progress=False)
-
-    #print(symDaily)
-    dayFirst = symDaily.iloc[0].Close
-    dayEnd = symDaily.iloc[-1].Close
-
-    dataList = [symbol, dayFirst, dayEnd, dayEnd/dayFirst]    
-    return dataList
+from InvestingBase import sortSymbols, seralizeData
+from InvestingMetrics import getMetrics
 
 def monthlyMetric(filename, month, year):
     symbols = interestingFunds()        # Get symbols of interest
@@ -54,6 +38,7 @@ def monthlyMetric(filename, month, year):
 
     dataList = []                       # Allocate variable name
     for symbol in symbols:              # Lookup symbols
+        print(symbol)
         try:
             dataList.append(getMetrics(symbol, month, year))
         except:

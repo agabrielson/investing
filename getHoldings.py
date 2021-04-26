@@ -25,38 +25,16 @@
 #	0.3		210425		Look up holdings symbols once
 #						Fixed a bug with symbol names (<=2 were skipped)
 #						Disabled yf progress on screen
+#   0.32    210425      InvestingMetrics - moved getMetrics
 
-import yfinance as yf
 import requests
 import re 
 import numpy
 from bs4 import BeautifulSoup
 
 from interestingFunds import interestingFunds
-from InvestingBase import startMonthYear, endMonthYear, sortSymbols, seralizeData
-
-# Try to figure out the monthly return for a symbol
-def getMetrics(symbol, month, year):
-	month, year = startMonthYear(month, year)
-	monthEnd, yearEnd = endMonthYear(month, year)
-
-	start = "%4.4d-%2.2d-%2.2d" % (year, month, 1)
-	end = "%4.4d-%2.2d-%2.2d" % (yearEnd, monthEnd, 1)
-	try:
-		symDaily = yf.download(symbol, start, end, interval="1mo",progress=False)
-		#print(symDaily)
-		dayFirst = symDaily.iloc[0].Close
-
-		sdLen = len(symDaily)
-		dayEnd = symDaily.iloc[-1].Close
-		if(numpy.isnan(dayEnd)):
-			dayEnd = symDaily.iloc[sdLen-2].Close
-
-		metricsList = [symbol, dayFirst, dayEnd, dayEnd/dayFirst]
-	except:
-		metricsList = [symbol, " ", " ", " "]
-	
-	return metricsList
+from InvestingBase import sortSymbols, seralizeData
+from InvestingMetrics import getMetrics
 
 # Let's lookup each symbol once...
 #	Make a call to get month return for a given period
