@@ -108,6 +108,7 @@ def yfGetQuarterlyMetrics(symbol):
 def quarterlyMetric(filename):
     symbols = interestingFunds()    #Get symbols of interest
     #symbols = ["FFGIX", "FFGCX", "FSRRX", "FACNX", "FIQJX", "FCSRX", "FSMEX", "FGKPX", "VTIVX"]
+    symbols = ['FFGIX']
 
     # Sort symbols & remove duplicates
     symbols = sorted(symbols)
