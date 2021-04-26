@@ -38,9 +38,9 @@ tracking has a sample spreadsheet used to track data points over multiple months
 
  Mutual funds are typically described somewhere in Edgar. If you search for a specific fund, you can find others grouped within an instition. Note a bank like Fidelity has many institions. Not all funds referenced in Edgar are current - funds may have shutdown.
 
- 	```
+ 	
 	https://www.sec.gov/edgar/searchedgar/mutualsearch.html
-	```
+	
 
 ## License
 Distributed under the MIT License. See LICENSE for more information.
