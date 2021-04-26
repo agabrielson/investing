@@ -4,10 +4,27 @@
 # InvestingBase.py
 #
 # Rev History:
-#   0.1     210418      New file - cleaning up similar code
+#   0.1		210418		New file - cleaning up similar code
+#	0.2		210426		Add procRequest & standardize
 
 from datetime import date
 import pandas as pd
+import requests
+import re 
+
+from bs4 import BeautifulSoup
+
+# Make a request and start to reduce the string
+#   We are only interested in the table with holdings information
+def procRequest(URLSym):
+    page = requests.get(URLSym)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    fullPage = soup.get_text();
+
+    #Remove space
+    fullPage = re.sub(r'\n\s*\n', '\n', fullPage, flags=re.MULTILINE)
+
+    return fullPage
 
 # Verify month and year are sane
 def startMonthYear(month, year):

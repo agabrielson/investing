@@ -26,14 +26,14 @@
 #						Fixed a bug with symbol names (<=2 were skipped)
 #						Disabled yf progress on screen
 #   0.32    210425      InvestingMetrics - moved getMetrics
+#	0.33	210426		InvestingBase - moved procRequest
+#						Adjusted code for standardized procRequest
 
-import requests
-import re 
 import numpy
-from bs4 import BeautifulSoup
+import re 
 
 from interestingFunds import interestingFunds
-from InvestingBase import sortSymbols, seralizeData
+from InvestingBase import procRequest, sortSymbols, seralizeData
 from InvestingMetrics import getMetrics
 
 # Let's lookup each symbol once...
@@ -82,16 +82,26 @@ def getSpecificHolding(str):
 	return holding 
 
 # Put together the holdings list
-def buildHoldings(reducedStr):
+#	find the table holding all data
+def buildHoldings(fullPage):
+
+	# Find first and last deliminiter
+	#	Table start deliminiter
+	tableLoc = fullPage.find('Top 10 Holdings')
+	if(tableLoc == -1):
+		tableLoc = fullPage.find('Top 25 Holdings')
+
+	fullPage = fullPage[tableLoc:]
+
 	# Find As Of & last deliminiter (end of table)
-	matchAsOf = reducedStr.find("As of")	# Pull out As of 01/31/2021
-	asOf = reducedStr[matchAsOf:matchAsOf+16]
+	matchAsOf = fullPage.find("As of")	# Pull out As of 01/31/2021
+	asOf = fullPage[matchAsOf:matchAsOf+16]
 	
 	# Find first deliminiter (start of table)
-	matchStart = reducedStr.find("Total Net Assets")+len("Total Net Assets")
+	matchStart = fullPage.find("Total Net Assets")+len("Total Net Assets")
 	
 	# This string has all holdings, need to get individual holdings
-	reducedStr = reducedStr[matchStart:matchAsOf-1]
+	fullPage = fullPage[matchStart:matchAsOf-1]
 
 	# Init empty containers
 	holdingsList = []	#This is for the specific fund
@@ -100,7 +110,7 @@ def buildHoldings(reducedStr):
 	iterCnt = True
 	while iterCnt == True:
 		try:	# Look for the percentage (3rd col)
-			percLoc = re.search("\d+(\.\d\d%|\s\bpercent\b)",reducedStr).start()+5
+			percLoc = re.search("\d+(\.\d\d%|\s\bpercent\b)",fullPage).start()+5
 		except:	# Give if it doesn't exist
 			iterCnt = False
 			break
@@ -110,11 +120,11 @@ def buildHoldings(reducedStr):
 			iterCnt = False
 			break
 
-		substr = reducedStr[0:percLoc+1] 		# One line from the table
+		substr = fullPage[0:percLoc+1] 		# One line from the table
 		holding = getSpecificHolding(substr)	# Extract the 2-3 values
 		matchStart = percLoc+2					# Enable the regex to find the next 'x.xx%'
 		
-		reducedStr = reducedStr[percLoc+1:matchAsOf-1]
+		fullPage = fullPage[percLoc+1:matchAsOf-1]
 		holding += [" "]	# add an empty field as a placeholder
 		holdingsList.append(holding)
 
@@ -122,25 +132,6 @@ def buildHoldings(reducedStr):
 		holdingsDict[i[1]] = None
 
 	return holdingsList, holdingsDict, asOf
-
-
-# Make a request and start to reduce the string
-#	We are only interested in the table with holdings information
-def procRequest(page):
-	soup = BeautifulSoup(page.content, 'html.parser')
-	fullPage = soup.get_text();
-
-	# ident table start
-	tableLoc = fullPage.find('Top 10 Holdings')
-	if(tableLoc == -1):
-		tableLoc = fullPage.find('Top 25 Holdings')
-
-	reducedStr = fullPage[tableLoc:]
-
-	#Remove space
-	str = re.sub(r'\n\s*\n', '\n', reducedStr, flags=re.MULTILINE)
-
-	return str
 
 # We need to bring the holdingsDict Value data back into the symbols data list
 def mergeDictList(holdingsDict, symbolsData):
@@ -154,6 +145,7 @@ def getHoldings(filename, month, year):
 	# Get symbols of interest & sort
 	symbols = interestingFunds()
 	#symbols = ["FFGIX", "FFGCX", "FSRRX", "FACNX", "FIQJX", "FCSRX", "FSMEX", "FGKPX", "VTIVX"]
+
 	symbols = sortSymbols(symbols)      # Sort symbols & remove duplicates
 
 	# String to locate fund holdings
@@ -173,8 +165,7 @@ def getHoldings(filename, month, year):
 		#URLSym += URLLong 		#Get top 25 instead of top 10
 		
 		# Lookup the holdings
-		page = requests.get(URLSym)
-		pageProc = procRequest(page)
+		pageProc = procRequest(URLSym)
 		holdings = " "
 		holdings, hDictSub, asOf = buildHoldings(pageProc)
 		holdingsDict.update(hDictSub)	#Merge dictionaries - one lookup
