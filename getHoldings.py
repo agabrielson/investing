@@ -22,6 +22,9 @@
 #						Fixed yfinance return bug, an extra row with nan...
 #	0.16	210413 		General code documentation, clean up, and variable rename for sanity
 #   0.2     210418      Cleaning up code significantly
+#	0.3		210425		Look up holdings symbols once
+#						Fixed a bug with symbol names (<=2 were skipped)
+#						Disabled yf progress on screen
 
 import yfinance as yf
 import requests
@@ -40,7 +43,7 @@ def getMetrics(symbol, month, year):
 	start = "%4.4d-%2.2d-%2.2d" % (year, month, 1)
 	end = "%4.4d-%2.2d-%2.2d" % (yearEnd, monthEnd, 1)
 	try:
-		symDaily = yf.download(symbol, start, end, interval="1mo")
+		symDaily = yf.download(symbol, start, end, interval="1mo",progress=False)
 		#print(symDaily)
 		dayFirst = symDaily.iloc[0].Close
 
@@ -54,6 +57,21 @@ def getMetrics(symbol, month, year):
 		metricsList = [symbol, " ", " ", " "]
 	
 	return metricsList
+
+# Let's lookup each symbol once...
+#	Make a call to get month return for a given period
+def lookupSymbol(symbol, month, year):
+	# With fund symbol information, let's get the 
+	monthRtnStr = ""
+	if(symbol.find(" ")):
+		symMetrics = getMetrics(symbol, month, year)	# look up return for a symbol
+		monthRtn = symMetrics[3]
+		if monthRtn != " ":
+			monthRtnList = ("%.4f" % monthRtn)
+			monthRtnStr = " "
+			monthRtnStr = monthRtnStr.join(monthRtnList).replace(" ","")
+
+	return monthRtnStr
 
 # Process the specific holdings
 #	(Company, Symbol, Total Net Assets)
@@ -86,8 +104,7 @@ def getSpecificHolding(str):
 	return holding 
 
 # Put together the holdings list
-#	Make a call to get month return for a given period
-def buildHoldings(reducedStr, month, year):
+def buildHoldings(reducedStr):
 	# Find As Of & last deliminiter (end of table)
 	matchAsOf = reducedStr.find("As of")	# Pull out As of 01/31/2021
 	asOf = reducedStr[matchAsOf:matchAsOf+16]
@@ -98,7 +115,10 @@ def buildHoldings(reducedStr, month, year):
 	# This string has all holdings, need to get individual holdings
 	reducedStr = reducedStr[matchStart:matchAsOf-1]
 
-	holdingsList = []
+	# Init empty containers
+	holdingsList = []	#This is for the specific fund
+	holdingsDict = {}	#This will be for a mass lookup
+
 	iterCnt = True
 	while iterCnt == True:
 		try:	# Look for the percentage (3rd col)
@@ -116,20 +136,15 @@ def buildHoldings(reducedStr, month, year):
 		holding = getSpecificHolding(substr)	# Extract the 2-3 values
 		matchStart = percLoc+2					# Enable the regex to find the next 'x.xx%'
 		
-		# With fund symbol information, let's get the 
-		if(len(holding) > 2) and (holding[1].find(".")) and (holding[1].find(" ")):
-			dl = getMetrics(holding[1], month, year)	# look up return for a symbol
-			monthRtn = dl[3]
-			if monthRtn != " ":
-				monthRtnList = ("%.4f" % monthRtn)
-				monthRtnStr = " "
-				monthRtnStr = monthRtnStr.join(monthRtnList).replace(" ","")
-				holding += [monthRtnStr]
-		
 		reducedStr = reducedStr[percLoc+1:matchAsOf-1]
+		holding += [" "]	# add an empty field as a placeholder
 		holdingsList.append(holding)
 
-	return holdingsList, asOf
+	for i in holdingsList:
+		holdingsDict[i[1]] = None
+
+	return holdingsList, holdingsDict, asOf
+
 
 # Make a request and start to reduce the string
 #	We are only interested in the table with holdings information
@@ -149,48 +164,71 @@ def procRequest(page):
 
 	return str
 
+# We need to bring the holdingsDict Value data back into the symbols data list
+def mergeDictList(holdingsDict, symbolsData):
+	for symbol in holdingsDict:
+		for n, i in enumerate(symbolsData):
+			if((len(i) > 2) and (symbol == i[2])):
+				i[4] = holdingsDict[symbol]
+
 # Main
 def getHoldings(filename, month, year):
+	# Get symbols of interest & sort
 	symbols = interestingFunds()
 	#symbols = ["FFGIX", "FFGCX", "FSRRX", "FACNX", "FIQJX", "FCSRX", "FSMEX", "FGKPX", "VTIVX"]
-
 	symbols = sortSymbols(symbols)      # Sort symbols & remove duplicates
 
+	# String to locate fund holdings
 	URL = 'https://www.marketwatch.com/investing/fund/'
 	URLLong = '/holdings'
 
-	symbolsData = [] # prealloc container
+	# prealloc container
+	holdingsDict = {}
+	symbolsData = [] 
+
 	# top of the spreadsheet
 	symbolsData.append(['Fund','Company Symbol','Total Net Assets','Total Net Assets','Monthly Rtn'])
+	# Build the list of holdings for each fund
 	for symbol in symbols:
 		print(symbol)
 		URLSym = URL + symbol
 		#URLSym += URLLong 		#Get top 25 instead of top 10
 		
+		# Lookup the holdings
 		page = requests.get(URLSym)
 		pageProc = procRequest(page)
 		holdings = " "
-		holdings, asOf = buildHoldings(pageProc, month, year)
-		
+		holdings, hDictSub, asOf = buildHoldings(pageProc)
+		holdingsDict.update(hDictSub)	#Merge dictionaries - one lookup
+
+		# Build table to serialize, note mergeDict will add value info
 		strList = [symbol] + [asOf]
 		symbolsData.append(strList)
 		for i in holdings:
 			symbolsData.append([" "] + i)
-		
+	
+	#Lookup holdings
+	for symbol in holdingsDict:
+		holdingsDict[symbol] = lookupSymbol(symbol, month, year)
+		print(symbol, "\t->\t", holdingsDict[symbol])
+	
+	# Add value info into the symbolsData
+	mergeDictList(holdingsDict, symbolsData) # merge symbol returns into list
+
 	seralizeData(filename, symbolsData)
 
 if __name__ == "__main__":
     import sys
 
-    year = None                        # month to lookup
+    year = None							# month to lookup
     if(len(sys.argv) >= 4):
     	year = sys.argv[3]
 
-    month = None                        # month to lookup
+    month = None						# month to lookup
     if(len(sys.argv) >= 3):
     	month = sys.argv[2]
 
-    filename = 'fundHoldings.xlsx'   # File name to seralize data
+    filename = 'fundHoldings.xlsx'		# File name to seralize data
     if(len(sys.argv) >= 2):
     	filename = sys.argv[1]
 
