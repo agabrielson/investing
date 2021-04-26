@@ -6,8 +6,10 @@
 # Rev History:
 #   0.1		210418		New file - cleaning up similar code
 #	0.2		210426		Add procRequest & standardize
+#	0.21	210426		Start checking procRequest for errors
 
 from datetime import date
+import time
 import pandas as pd
 import requests
 import re 
@@ -16,8 +18,20 @@ from bs4 import BeautifulSoup
 
 # Make a request and start to reduce the string
 #   We are only interested in the table with holdings information
-def procRequest(URLSym):
+#	Try a few times if a URL has an issue...
+def procRequest(URLSym, iter = 5):
+
+    if(iter == 0):	# Website is having issues...
+    	return " "
+
     page = requests.get(URLSym)
+    
+    # If the webpage is having issues, try again...
+    if(page.status_code != 200):
+    	print("URL Failed... Trying again")
+    	time.sleep(0.2)
+    	return procRequest(URLSym, iter-1)
+
     soup = BeautifulSoup(page.content, 'html.parser')
     fullPage = soup.get_text();
 
