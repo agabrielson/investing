@@ -19,9 +19,9 @@ This repo speeds up the investing data collection to enable more consistent rese
 ## Usage
 
 Runable python scripts:
-	* monthlyMetrics.py: Collect monthly pricing data for funds of interest. Most pricing services provide limited granularity.
-	* quartelyMetrics.py: Pull longer term data points together that can be extremely time consuming.
-	* getHoldings.py: Extract fund holdings and attempt to get monthly return
+* monthlyMetrics.py: Collect monthly pricing data for funds of interest. Most pricing services provide limited granularity.
+* quartelyMetrics.py: Pull longer term data points together that can be extremely time consuming.
+* getHoldings.py: Extract fund holdings and attempt to get monthly return
 
 Examples calls are located in the header of each python file mentioned above
 
