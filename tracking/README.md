@@ -12,6 +12,7 @@ This directory has a spreadsheet used to store data points produced by the inves
     <li><a href="#Quartely">Quartely</a></li>
     <li><a href="#Check-Balanced">Check Balanced</a></li>
     <li><a href="#References">References</a></li>
+    <li><a href="#Disclaimer">Disclaimer</a></li>
   </ol>
 </details>
 
