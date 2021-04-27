@@ -157,7 +157,7 @@ def getHoldings(filename, month, year):
 	symbolsData = [] 
 
 	# top of the spreadsheet
-	symbolsData.append(['Fund','Company Symbol','Total Net Assets','Total Net Assets','Monthly Rtn'])
+	symbolsData.append(['Fund','Company','Symbol','Total Net Assets','Monthly Rtn'])
 	# Build the list of holdings for each fund
 	for symbol in symbols:
 		print(symbol)
