@@ -1,5 +1,18 @@
 # Investing Research Tools
 
+<!-- TABLE OF CONTENTS -->
+<details open="open">
+  <summary>Table of Contents: Spreadsheet description (tabs)</summary>
+  <ol>
+    <li><a href="#About-The-Project">About The Project</a></li>
+    <li><a href="#Prerequisites">Prerequisites</a></li>
+    <li><a href="#Usage">Usage</a></li>
+    <li><a href="#Approach">Approach</a></li>
+    <li><a href="#Finding-Funds-of-Interest">Finding Funds of Interest</a></li>
+    <li><a href="#License">License</a></li>
+    <li><a href="#Disclaimer">Disclaimer</a></li>
+  </ol>
+</details>
 
 ## About The Project
 
@@ -34,7 +47,7 @@ One way to use this capability...
 1. You can decide which funds to inved in based on your strategy.
 tracking has a sample spreadsheet used to track data points over multiple months
 
-## Finding funds of interest
+## Finding Funds of Interest
 
  Mutual funds are typically described somewhere in Edgar. If you search for a specific fund, you can find others grouped within an instition. Note a bank like Fidelity has many institions. Not all funds referenced in Edgar are current - funds may have shutdown.
  	
