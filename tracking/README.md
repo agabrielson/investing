@@ -4,7 +4,7 @@ This directory has a spreadsheet used to store data points produced by the inves
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
-  <summary>Table of Contents: Spreadsheet tabs</summary>
+  <summary>Table of Contents: Spreadsheet description (tabs)</summary>
   <ol>
     <li><a href="#Posistions">Posistions</a></li>
     <li><a href="#Monthly">Monthly</a></li>
@@ -15,10 +15,13 @@ This directory has a spreadsheet used to store data points produced by the inves
   </ol>
 </details>
 
-
 ## Posistions
 
+Fill these data points in monthly to describe your holdings
+
 ## Monthly
+
+How are funds changing on a monthly basis
 
 * Symbol: Company symbol	
 * YTD: Year to date change
