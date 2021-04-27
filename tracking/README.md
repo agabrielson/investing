@@ -116,3 +116,9 @@ https://www.investopedia.com/terms/s/standarddeviation.asp
 <a id="9">[9]</a> 
 https://www.investopedia.com/terms/r/r-squared.asp 
 
+## Disclaimer 
+
+This disclaimer informs readers that the views, thoughts, and opinions expressed in the text belong solely to the author, and not necessarily to the author's employer, organization, committee or other group or individual.
+
+In fact, you should develop an investment strategy that works for you
+
