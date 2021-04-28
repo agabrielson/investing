@@ -2,7 +2,7 @@
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
-  <summary>Table of Contents: Spreadsheet description (tabs)</summary>
+  <summary>Table of Contents</summary>
   <ol>
     <li><a href="#About-The-Project">About The Project</a></li>
     <li><a href="#Prerequisites">Prerequisites</a></li>
