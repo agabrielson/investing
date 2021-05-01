@@ -5,6 +5,7 @@
 #
 # Rev History:
 #   0.1     210425      New file - Merging similar code
+#   0.15    210430      Change yf to get additional data
 
 import yfinance as yf
 import numpy
@@ -28,7 +29,8 @@ def getMetrics(symbol, month, year):
         #   Stocks can do "1mo", which has much less data
         #   Want one metric function...
         #   Difference is "1mo" gets first day from month before and after
-        symDaily = yf.download(symbol, start, end, interval="1mo",progress=False)
+        #   "1d" gets alot more data, but sometimes "1mo" only wants first of the month
+        symDaily = yf.download(symbol, start, end, interval="1d",progress=False)
 
         dayFirst = symDaily.iloc[0].Close
         dayEnd = symDaily.iloc[-1].Close
@@ -41,6 +43,8 @@ def getMetrics(symbol, month, year):
         metricsList = [symbol, " ", " ", " "]
 
     #intermediate values for debugging
+    getMetrics.start = start
+    getMetrics.end = end
     getMetrics.symDaily = symDaily
     getMetrics.dayFirst = dayFirst
     getMetrics.dayEnd = dayEnd
