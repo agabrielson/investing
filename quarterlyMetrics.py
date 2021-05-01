@@ -19,13 +19,13 @@
 #   0.3     210426      Add Market Watch as a data source 
 #                       Added significant number of fields
 #                       Moving procRequest to InvestingBase
+#   0.35    210501      Enhance symbol input
 
 import yfinance as yf
+import pandas as pd
 import itertools 
-
 from datetime import date
-from interestingFunds import interestingFunds
-from InvestingBase import procRequest, getDate, sortSymbols, seralizeData
+from InvestingBase import readFunds, procRequest, getDate, sortSymbols, seralizeData
 
 def mwProcData(fullPage, searchStr):
     tableLoc = fullPage.find(searchStr)
@@ -106,14 +106,11 @@ def yfGetQuarterlyMetrics(symbol):
 #   Going to pull suspect and missing data points from MarketWatch
 #   Then merge the two data sources
 def quarterlyMetric(filename):
-    symbols = interestingFunds()    #Get symbols of interest
-    #symbols = ["FFGIX", "FFGCX", "FSRRX", "FACNX", "FIQJX", "FCSRX", "FSMEX", "FGKPX", "VTIVX"]
-
+    symbols = readFunds('Symbols.csv')      #Get symbols of interest
+    #symbols = readFunds('SymbolsDebug.csv')
+    
     # Sort symbols & remove duplicates
-    symbols = sorted(symbols)
-    res = [] 
-    [res.append(symbol) for symbol in symbols if symbol not in res]
-    symbols = res
+    sortSymbols(symbols)
 
     # String to locate fund holdings
     URL = 'https://www.marketwatch.com/investing/fund/'
@@ -124,7 +121,7 @@ def quarterlyMetric(filename):
     dateToday = date.today().strftime('%Y-%m-%d')
     count = True            # Build header
     
-    for symbol in symbols:  # lookup data
+    for symbol in symbols.index:  # lookup data
         print(symbol)
         URLSym = URL + symbol
 

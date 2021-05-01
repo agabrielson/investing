@@ -7,6 +7,7 @@
 #   0.1		210418		New file - cleaning up similar code
 #	0.2		210426		Add procRequest & standardize
 #	0.21	210426		Start checking procRequest for errors
+#	0.35	210501		Add enhanced symbol input; updated symbols to pandas dataframe
 
 from datetime import date
 import time
@@ -74,12 +75,16 @@ def getDate():
 
 # Deduplicate symbols and sort them
 def sortSymbols(symbols):
-    symbols = sorted(symbols)
-    res = [] 
-    [res.append(symbol) for symbol in symbols if symbol not in res]
-    return res
+	symbols.sort_index()
+	symbols.drop_duplicates()
 
 # Write data to the filesystem
 def seralizeData(filename, dataList, cols = None):
 	df = pd.DataFrame(dataList, columns=cols)
 	df.to_excel(filename)
+
+# Read in the symbols of interest
+# Maintaining a structure has become unwieldy... Reading in a simple spreadsheet is easier.
+def readFunds(filename):
+	symbols = pd.read_csv(filename, index_col=0, dtype={'Name': str}) 
+	return symbols
