@@ -28,12 +28,13 @@
 #   0.32    210425      InvestingMetrics - moved getMetrics
 #	0.33	210426		InvestingBase - moved procRequest
 #						Adjusted code for standardized procRequest
+#	0.35	210501		Enhance symbol input
 
 import numpy
 import re 
+import pandas as pd
 
-from interestingFunds import interestingFunds
-from InvestingBase import procRequest, sortSymbols, seralizeData
+from InvestingBase import readFunds, procRequest, sortSymbols, seralizeData
 from InvestingMetrics import getMetrics
 
 # Let's lookup each symbol once...
@@ -143,10 +144,10 @@ def mergeDictList(holdingsDict, symbolsData):
 # Main
 def getHoldings(filename, month, year):
 	# Get symbols of interest & sort
-	symbols = interestingFunds()
-	#symbols = ["FFGIX", "FFGCX", "FSRRX", "FACNX", "FIQJX", "FCSRX", "FSMEX", "FGKPX", "VTIVX"]
-
-	symbols = sortSymbols(symbols)      # Sort symbols & remove duplicates
+	symbols = readFunds('Symbols.csv')
+	#symbols = readFunds('SymbolsDebug.csv')
+	
+	sortSymbols(symbols)      # Sort symbols & remove duplicates
 
 	# String to locate fund holdings
 	URL = 'https://www.marketwatch.com/investing/fund/'
@@ -159,7 +160,7 @@ def getHoldings(filename, month, year):
 	# top of the spreadsheet
 	symbolsData.append(['Fund','Company','Symbol','Total Net Assets','Monthly Rtn'])
 	# Build the list of holdings for each fund
-	for symbol in symbols:
+	for symbol in symbols.index:
 		print(symbol)
 		URLSym = URL + symbol
 		#URLSym += URLLong 		#Get top 25 instead of top 10

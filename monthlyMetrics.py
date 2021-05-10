@@ -25,19 +25,20 @@
 #   0.3     210418      Cleaning up code significantly
 #   0.31    210425      Cleaning up display
 #   0.32    210425      InvestingMetrics - moved getMetrics
+#   0.35    210501      Enhance symbol input
 
-from interestingFunds import interestingFunds
-from InvestingBase import sortSymbols, seralizeData
+import pandas as pd
+from InvestingBase import readFunds, sortSymbols, seralizeData
 from InvestingMetrics import getMetrics
 
 def monthlyMetric(filename, month, year):
-    symbols = interestingFunds()        # Get symbols of interest
-    #symbols = ['FSMEX']
-    
-    symbols = sortSymbols(symbols)      # Sort symbols & remove duplicates
+    symbols = readFunds('Symbols.csv')
+    #symbols = readFunds('SymbolsDebug.csv')
+
+    sortSymbols(symbols)                # Sort symbols & remove duplicates
 
     dataList = []                       # Allocate variable name
-    for symbol in symbols:              # Lookup symbols
+    for symbol in symbols.index:        # Lookup symbols
         print(symbol)
         try:
             dataList.append(getMetrics(symbol, month, year))
