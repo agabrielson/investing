@@ -53,6 +53,15 @@ tracking has a sample spreadsheet used to track data points over multiple months
  	
 	https://www.sec.gov/edgar/searchedgar/mutualsearch.html
 
+CIK Lookup data
+  https://www.sec.gov/Archives/edgar/cik-lookup-data.txt
+
+Edgar CIKS (Stocks)
+  https://www.sec.gov/files/company_tickers.json
+
+Searching mutual funds
+  https://www.sec.gov/cgi-bin/browse-edgar?company=&match=&CIK=FXAIX
+
 ## License
 Distributed under the MIT License. See LICENSE for more information.
 
