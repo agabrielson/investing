@@ -36,6 +36,7 @@ Runable python scripts:
 * quartelyMetrics.py: Pull longer term data points together that can be extremely time consuming.
 * getHoldings.py: Extract fund holdings and attempt to get monthly return
 * getStocks.py: Get monthly stock returns for all stocks (US market)
+* stocksQuartely.py: Pull longer term stock data points together for all stocks (US market)
 
 Examples calls are located in the header of each python file mentioned above
 
