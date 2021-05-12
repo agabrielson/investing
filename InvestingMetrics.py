@@ -6,6 +6,7 @@
 # Rev History:
 #   0.1     210425      New file - Merging similar code
 #   0.15    210430      Change yf to get additional data
+#   0.16    210512      Add getMetricsBulk to get significant data at once
 
 import yfinance as yf
 import numpy
@@ -13,6 +14,7 @@ import numpy
 from InvestingBase import startMonthYear, endMonthYear
 
 # Try to figure out the monthly return for a symbol
+#   Note: I suspect this method will become obsolete shortly...
 def getMetrics(symbol, month, year):
     symDaily = "NA"
     dayFirst = "NA"
@@ -32,7 +34,7 @@ def getMetrics(symbol, month, year):
         #   "1d" gets alot more data, but sometimes "1mo" only wants first of the month
         symDaily = yf.download(symbol, start, end, interval="1d",progress=False)
 
-        dayFirst = symDaily.iloc[0].Close
+        dayFirst = symDaily.iloc[0].Open
         dayEnd = symDaily.iloc[-1].Close
 
         if(numpy.isnan(dayEnd)):
@@ -51,5 +53,48 @@ def getMetrics(symbol, month, year):
 
     return metricsList
 
+# Try to figure out the monthly return for a symbol
+#   Note: This will probably become the standard function, it will also probably be split up
+#   Note: Yahoo Finance could be throttling this significantly...
+#           Disabling threads to go a little slower, won't make a difference
+def getMetricsBulk(symbols, month, year):
+    symDaily = "NA"
+    dayFirst = "NA"
+    dayEnd = "NA"
 
+    month, year = startMonthYear(month, year)
+    monthEnd, yearEnd = endMonthYear(month, year)
 
+    start = "%4.4d-%2.2d-%2.2d" % (year, month, 1)
+    end = "%4.4d-%2.2d-%2.2d" % (yearEnd, monthEnd, 1)
+
+    #Funds can do "1m" and get more data
+    #   Stocks can do "1mo", which has much less data
+    #   Want one metric function...
+    #   Difference is "1mo" gets first day from month before and after
+    #   "1d" gets alot more data, but sometimes "1mo" only wants first of the month
+    sym = yf.download(symbols, start, end, interval="1d", 
+        threads=False, group_by="ticker", actions=False)
+ 
+    # Init empty container
+    metricsList = []   #This is for the tickers being looked up
+    prevSym = ''
+    # breaking out aSym, var makes getting to data much easier
+    #   It also duplicates symbols by 5x...
+    for aSym, v1 in sym:
+        if(prevSym == aSym):
+            continue
+
+        prevSym = aSym
+        try:
+            dayFirst = sym[aSym].iloc[0].Open
+            dayEnd = sym[aSym].iloc[-1].Close
+
+            if(numpy.isnan(dayEnd)):
+                dayEnd = sym[aSym].iloc[sdLen-2].Close
+
+            metricsList.append([aSym, dayFirst, dayEnd, dayEnd/dayFirst])
+        except:
+            metricsList.append([aSym, " ", " ", " "])
+
+    return metricsList

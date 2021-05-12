@@ -107,7 +107,7 @@ def yfGetQuarterlyMetrics(symbol):
 #   Then merge the two data sources
 def quarterlyMetric(filename):
     symbols = readFunds('Symbols.csv')      #Get symbols of interest
-    #symbols = readFunds('SymbolsDebug.csv')
+    symbols = readFunds('SymbolsDebug.csv')
     
     # Sort symbols & remove duplicates
     sortSymbols(symbols)
@@ -147,9 +147,9 @@ def quarterlyMetric(filename):
     seralizeData(filename, dataList, hdrList)    # Seralize data
 
 if __name__ == "__main__":
-        import sys
-        filename = 'quarterlySymbols.xlsx'
-        if(len(sys.argv) == 2):
-            filename = sys.argv[1]
+    import sys
+    filename = 'quarterlySymbols.xlsx'
+    if(len(sys.argv) == 2):
+        filename = sys.argv[1]
 
-        quarterlyMetric(filename)
+    quarterlyMetric(filename)
