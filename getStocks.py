@@ -25,22 +25,8 @@ import requests
 import json
 import numpy as np
 
-from InvestingBase import seralizeData
+from InvestingBase import seralizeData, procStocks, extractTicker
 from InvestingMetrics import getMetricsBulk
-
-# Get json from a URL
-# Return json structure
-def procStocks(URLSym):
-	page = requests.get(URLSym)
-	return page.json()
-
-# Extract the ticker symbol
-def extractTicker(stocksJson):
-	symList = []
-	for key in stocksJson: 	
-		symList.append(stocksJson[key].get('ticker'))
-
-	return symList
 
 # Get stock metrics for a given month
 def stockMetrics(filename, month, year):

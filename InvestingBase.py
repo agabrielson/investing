@@ -17,6 +17,20 @@ import re
 
 from bs4 import BeautifulSoup
 
+# Get json from a URL
+# Return json structure
+def procStocks(URLSym):
+	page = requests.get(URLSym)
+	return page.json()
+
+# Extract the ticker symbol
+def extractTicker(stocksJson):
+	symList = []
+	for key in stocksJson: 	
+		symList.append(stocksJson[key].get('ticker'))
+
+	return symList
+
 # Make a request and start to reduce the string
 #   We are only interested in the table with holdings information
 #	Try a few times if a URL has an issue...

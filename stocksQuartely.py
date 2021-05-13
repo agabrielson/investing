@@ -17,7 +17,7 @@ import yfinance as yf
 import pandas as pd
 import itertools 
 from datetime import date
-from InvestingBase import readFunds, procRequest, getDate, sortSymbols, seralizeData
+from InvestingBase import procStocks, extractTicker, seralizeData
 
 def checkRtnVals(value):
     if(value is not None):
