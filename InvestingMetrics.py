@@ -77,6 +77,7 @@ def getMetricsBulk(symbols, month, year):
         threads=False, group_by="ticker", actions=False)
  
     # Init empty container
+    counter = 0
     metricsList = []   #This is for the tickers being looked up
     prevSym = ''
     # breaking out aSym, var makes getting to data much easier
@@ -96,5 +97,7 @@ def getMetricsBulk(symbols, month, year):
             metricsList.append([aSym, dayFirst, dayEnd, dayEnd/dayFirst])
         except:
             metricsList.append([aSym, " ", " ", " "])
+            counter+=1
 
+    print("Fail Count: %d" % counter)
     return metricsList

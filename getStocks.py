@@ -55,7 +55,7 @@ if __name__ == "__main__":
 		month = sys.argv[2]
 
 	filename = 'stockData.xlsx'
-	if(len(sys.argv) == 2):
+	if(len(sys.argv) >= 2):
 		filename = sys.argv[1]
-
+	
 	stockMetrics(filename, month, year)
