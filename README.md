@@ -37,6 +37,7 @@ Runable python scripts:
 * getHoldings.py: Extract fund holdings and attempt to get monthly return
 * getStocks.py: Get monthly stock returns for all stocks (US market)
 * stocksQuartely.py: Pull longer term stock data points together for all stocks (US market)
+* getHolders.py: Get the top 10 list of holders for a company 
 
 Examples calls are located in the header of each python file mentioned above
 
