@@ -10,6 +10,7 @@
 
 import yfinance as yf
 import numpy
+import sys
 
 from InvestingBase import startMonthYear, endMonthYear
 
@@ -34,11 +35,11 @@ def getMetrics(symbol, month, year):
         #   "1d" gets alot more data, but sometimes "1mo" only wants first of the month
         symDaily = yf.download(symbol, start, end, interval="1d",progress=False)
 
-        dayFirst = symDaily.iloc[0].Open
-        dayEnd = symDaily.iloc[-1].Close
+        dayFirst = symDaily.iloc[0]
+        dayEnd = symDaily.iloc[-1]
 
         if(numpy.isnan(dayEnd)):
-            dayEnd = symDaily.iloc[sdLen-2].Close
+            dayEnd = symDaily.iloc[-2].Close
 
         metricsList = [symbol, dayFirst, dayEnd, dayEnd/dayFirst]
     except:
@@ -65,15 +66,15 @@ def getMetricsBulk(symbols, month, year):
     month, year = startMonthYear(month, year)
     monthEnd, yearEnd = endMonthYear(month, year)
 
-    start = "%4.4d-%2.2d-%2.2d" % (year, month, 1)
-    end = "%4.4d-%2.2d-%2.2d" % (yearEnd, monthEnd, 1)
+    startDay = "%4.4d-%2.2d-%2.2d" % (year, month, 1)
+    endDay = "%4.4d-%2.2d-%2.2d" % (yearEnd, monthEnd, 1)
 
     #Funds can do "1m" and get more data
     #   Stocks can do "1mo", which has much less data
     #   Want one metric function...
     #   Difference is "1mo" gets first day from month before and after
     #   "1d" gets alot more data, but sometimes "1mo" only wants first of the month
-    sym = yf.download(symbols, start, end, interval="1d", 
+    sym = yf.download(symbols, startDay, endDay, interval="1d", 
         threads=False, group_by="ticker", actions=False)
  
     # Init empty container
@@ -92,10 +93,11 @@ def getMetricsBulk(symbols, month, year):
             dayEnd = sym[aSym].iloc[-1].Close
 
             if(numpy.isnan(dayEnd)):
-                dayEnd = sym[aSym].iloc[sdLen-2].Close
+                dayEnd = sym[aSym].iloc[-2].Close
 
             metricsList.append([aSym, dayFirst, dayEnd, dayEnd/dayFirst])
         except:
+            print("Unexpected error:", sys.exc_info()[0])
             metricsList.append([aSym, " ", " ", " "])
             counter+=1
 
