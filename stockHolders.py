@@ -25,8 +25,14 @@ def getStockHolders(symbol):
 
 	stock = yf.Ticker(symbol)
 
+	if(stock.institutional_holders is None or
+		not isinstance(stock.institutional_holders.columns[0],str) or
+		stock.institutional_holders.columns[0] not in 'Holder'):
+		return None
+
 	count = 0
 	ihLen = len(stock.institutional_holders)
+
 	while count < ihLen:
 		holder = stock.institutional_holders.iloc[count,0]
 		shares = stock.institutional_holders.iloc[count,1]
@@ -45,7 +51,7 @@ def getHolders(filename):
 	stocksJson = procStocks(URLSym)		# Obtain all tickers in JSON
 
 	symList = extractTicker(stocksJson) # We just need the ticker symbol for this script
-	#symList = ['TSLA', 'FB', 'YUM']
+	#symList = ['TSLA', 'SPY', 'RTNTF', 'FB', 'YUM']
 
 	# prealloc container
 	holderData = [] 
@@ -58,6 +64,10 @@ def getHolders(filename):
 		
 		holderData.append([symbol])
 		symData = getStockHolders(symbol)
+		
+		if(symData is None):
+			continue
+
 		for iSym in symData:
 			holderData.append(iSym)
 
