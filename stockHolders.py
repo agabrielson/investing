@@ -44,7 +44,7 @@ def getStockHolders(symbol):
 
 	return holders
 
-# Main
+# Main 
 def getHolders(filename):
 	# Get symbols of interest (all US symbols)
 	URLSym = 'https://www.sec.gov/files/company_tickers.json'
