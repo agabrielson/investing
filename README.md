@@ -55,22 +55,22 @@ tracking has a sample spreadsheet used to track data points over multiple months
 
  Mutual funds are typically described somewhere in Edgar. If you search for a specific fund, you can find others grouped within an instition. Note a bank like Fidelity has many institions. Not all funds referenced in Edgar are current - funds may have shutdown.
  	
-	https://www.sec.gov/edgar/searchedgar/mutualsearch.html
+    https://www.sec.gov/edgar/searchedgar/mutualsearch.html
 
 CIK Lookup data
-  	https://www.sec.gov/Archives/edgar/cik-lookup-data.txt
+    https://www.sec.gov/Archives/edgar/cik-lookup-data.txt
 
 Edgar CIKS (Stocks)
-  	https://www.sec.gov/files/company_tickers.json
+    https://www.sec.gov/files/company_tickers.json
 
 This code appears to have all stocks:
-  	https://github.com/shilewenuw/get_all_tickers
+    https://github.com/shilewenuw/get_all_tickers
 
 Searching mutual funds
-  	https://www.sec.gov/cgi-bin/browse-edgar?company=&match=&CIK=FXAIX
+    https://www.sec.gov/cgi-bin/browse-edgar?company=&match=&CIK=FXAIX
 
 Best list of all mutual funds:
-  	https://www.marketwatch.com/tools/mutual-fund/list/A
+    https://www.marketwatch.com/tools/mutual-fund/list/A
 
 ## License
 Distributed under the MIT License. See LICENSE for more information.
