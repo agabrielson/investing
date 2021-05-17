@@ -32,6 +32,7 @@ This repo speeds up the investing data collection to enable more consistent rese
 ## Usage
 
 Runable python scripts:
+* getAllMutualFunds.py: Get a list of existing mutual funds and descriptions, can be used to build the table needed for other fund scripts.
 * monthlyMetrics.py: Collect monthly pricing data for funds of interest. Most pricing services provide limited granularity.
 * quartelyMetrics.py: Pull longer term data points together that can be extremely time consuming.
 * getHoldings.py: Extract fund holdings and attempt to get monthly return
@@ -61,6 +62,9 @@ CIK Lookup data
 
 Edgar CIKS (Stocks)
   https://www.sec.gov/files/company_tickers.json
+
+This code appears to have all stocks:
+  https://github.com/shilewenuw/get_all_tickers
 
 Searching mutual funds
   https://www.sec.gov/cgi-bin/browse-edgar?company=&match=&CIK=FXAIX

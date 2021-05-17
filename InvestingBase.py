@@ -34,7 +34,7 @@ def extractTicker(stocksJson):
 # Make a request and start to reduce the string
 #   We are only interested in the table with holdings information
 #	Try a few times if a URL has an issue...
-def procRequest(URLSym, iter = 5):
+def procRequest(URLSym, iter = 5, reducedText = True):
 
     if(iter == 0):	# Website is having issues...
     	return " "
@@ -45,10 +45,13 @@ def procRequest(URLSym, iter = 5):
     if(page.ok == False):
     	print("URL Failed... Trying again")
     	time.sleep(0.2)
-    	return procRequest(URLSym, iter-1)
+    	return procRequest(URLSym, iter-1, reducedText)
 
     soup = BeautifulSoup(page.content, 'html.parser')
-    fullPage = soup.get_text();
+    if(reducedText == True):
+    	fullPage = soup.get_text()
+    else:
+    	fullPage = soup.prettify()
 
     #Remove space
     fullPage = re.sub(r'\n\s*\n', '\n', fullPage, flags=re.MULTILINE)
