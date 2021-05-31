@@ -35,14 +35,15 @@ def getMetrics(symbol, month, year):
         #   "1d" gets alot more data, but sometimes "1mo" only wants first of the month
         symDaily = yf.download(symbol, start, end, interval="1d",progress=False)
 
-        dayFirst = symDaily.iloc[0]
-        dayEnd = symDaily.iloc[-1]
+        dayFirst = symDaily.iloc[0].Open
+        dayEnd = symDaily.iloc[-1].Close
 
         if(numpy.isnan(dayEnd)):
             dayEnd = symDaily.iloc[-2].Close
 
         metricsList = [symbol, dayFirst, dayEnd, dayEnd/dayFirst]
     except:
+        print("Unexpected error:", sys.exc_info()[0])
         metricsList = [symbol, " ", " ", " "]
 
     #intermediate values for debugging
