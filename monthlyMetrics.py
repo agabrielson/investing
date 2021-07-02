@@ -42,7 +42,7 @@ def monthlyMetric(filename, month, year):
         print(symbol)
         try:
             dataList.append(getMetrics(symbol, month, year))
-        except:
+        except (IndexError, KeyError):
             dataList.append([symbol])
 
     cols = ['Symbol', 'Month Start', 'Month End', 'PERC']

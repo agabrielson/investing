@@ -42,7 +42,7 @@ def getMetrics(symbol, month, year):
             dayEnd = symDaily.iloc[-2].Close
 
         metricsList = [symbol, dayFirst, dayEnd, dayEnd/dayFirst]
-    except:
+    except (IndexError, ValueError):
         print("Unexpected error:", sys.exc_info()[0])
         metricsList = [symbol, " ", " ", " "]
 
@@ -97,7 +97,7 @@ def getMetricsBulk(symbols, month, year):
                 dayEnd = sym[aSym].iloc[-2].Close
 
             metricsList.append([aSym, dayFirst, dayEnd, dayEnd/dayFirst])
-        except:
+        except (IndexError, ValueError):
             print("Unexpected error:", sys.exc_info()[0])
             metricsList.append([aSym, " ", " ", " "])
             #counter+=1
