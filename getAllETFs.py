@@ -43,7 +43,7 @@ def stripHTML(entry):
             strippedEntry.append(line.rstrip('\n'))
 
     strippedEntry[1] = strippedEntry[1][1:-1]
-    #strippedEntry[1] = re.sub(r"()", " ", strippedEntry[1])
+    
     print(strippedEntry[1])
 
     return strippedEntry
@@ -58,6 +58,7 @@ def mwBuildFunds(reducedPage, fundList):
             entry = ""
         elif '</tr>' in line:
             entry = stripHTML(entry)
+            entry[0] = entry[0].replace('amp;','')
             fundList.append(entry[0:5])
         else:
             entry += line
@@ -81,7 +82,7 @@ def mwReducePage(fullPage):
     tableLoc = fullPage.find('/table')
     fullPage = fullPage[:tableLoc]
 
-
+    # Pages are broken up, verify there is actual data to get
     entries = fullPage.lower().split().count('</tr>')
     if(entries == 0):
         fullPage = None
