@@ -32,26 +32,31 @@ This repo speeds up the investing data collection to enable more consistent rese
 ## Usage
 
 Runable python scripts:
-* getAllMutualFunds.py: Get a list of existing mutual funds and descriptions, can be used to build the table needed for other fund scripts.
-* monthlyMetrics.py: Collect monthly pricing data for funds of interest. Most pricing services provide limited granularity.
-* quartelyMetrics.py: Pull longer term data points together that can be extremely time consuming.
-* getHoldings.py: Extract fund holdings and attempt to get monthly return
-* getStocks.py: Get monthly stock returns for all stocks (US market)
-* stocksQuartely.py: Pull longer term stock data points together for all stocks (US market)
-* getHolders.py: Get the top 10 list of holders for a company 
+* Mutual Funds
+  * getAllMutualFunds.py: Get a list of existing mutual funds and descriptions, can be used to build the table needed for other fund scripts.
+  * monthlyMetrics.py: Collect monthly pricing data for funds of interest. Most pricing services provide limited granularity.
+  * quartelyMetrics.py: Pull longer term data points together that can be extremely time consuming.
+  * getHoldings.py: Extract fund holdings and attempt to get monthly return
+* Stocks
+  * getStocks.py: Get monthly stock returns for all stocks (US market)
+  * stocksQuartely.py: Pull longer term stock data points together for all stocks (US market)
+  * getHolders.py: Get the top 10 list of holders for a company 
+* ETFs (in progress)
+  * getAllETFs.py: Get a list of existing ETFs with descriptions, can be used to build the table needed for other ETF scripts.
 
 Examples calls are located in the header of each python file mentioned above
 
 ## Approach
 
-One way to use this capability...
-1. Download data points available today with the scripts 
-1. Bring the data points together into a larger spreadsheet to see longer term trends
+One way to use the toolset...
+1. Determine which investments you want to track
+1. Download data points for investments with the scripts 
+1. Bring the data points together into a larger spreadsheet to see longer term monthly trends
 1. Analyze the trends that interest you
-1. You can decide which funds to inved in based on your strategy.
+1. You can decide which investments are right based on your strategy.
 tracking has a sample spreadsheet used to track data points over multiple months
 
-## Finding Funds of Interest
+## Finding Investments of Interest
 
  Mutual funds are typically described somewhere in Edgar. If you search for a specific fund, you can find others grouped within an instition. Note a bank like Fidelity has many institions. Not all funds referenced in Edgar are current - funds may have shutdown.
  	
