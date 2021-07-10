@@ -57,7 +57,7 @@ def mwBuildFunds(reducedPage, fundList):
             entry = ""
         elif '</tr>' in line:
             entry = stripHTML(entry)
-            fundList.append(entry[0:4])
+            fundList.append(entry[0:5])
         else:
             entry += line
     
@@ -107,7 +107,7 @@ def allMutualFunds(filename):
     mwPage = mwReducePage(mwPage)
     mwBuildFunds(mwPage, fundList)
 
-    cols = ['Name', 'Country', 'Exchange', 'Sector'] # need more
+    cols = ['Name', 'Symbol', 'Country', 'Exchange', 'Sector'] # need more
     seralizeData(filename, fundList, cols)      # Seralize data
     #seralizeData(filename, fundList)
 
