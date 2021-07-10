@@ -14,6 +14,7 @@
 #      
 # Rev History:
 #   0.1     210710      Initial Functionality
+#   0.15    210710      Get all ETFs, not just first page of each letter
 
 import pandas as pd
 import requests
@@ -80,7 +81,29 @@ def mwReducePage(fullPage):
     tableLoc = fullPage.find('/table')
     fullPage = fullPage[:tableLoc]
 
+
+    entries = fullPage.lower().split().count('</tr>')
+    if(entries == 0):
+        fullPage = None
+
     return fullPage
+
+def getETFListings(letter, URL, fundList):
+    mwPage = 'init'
+    numCount = 1
+    while mwPage is not None:
+        # Website splits table up over many pages...
+        URLSym = URL + letter + '/' + str(numCount)
+
+        mwPage = procRequest(URLSym, 1, False)  # need to append a letter 'A'->'Z'
+        mwPage = mwReducePage(mwPage)
+        if mwPage is None:
+            break;
+
+        mwBuildFunds(mwPage, fundList)
+        numCount+=1
+
+    return fundList
 
 # Find the name and description of existing mutual funds
 def allMutualFunds(filename):
@@ -92,20 +115,12 @@ def allMutualFunds(filename):
     ltrCount = 1
     for letter in ascii_lowercase:
         drawProgressBar(ltrCount/(len(ascii_lowercase)+1))
-        ltrCount+=1
-
-        URLSym = URL + letter
-
-        mwPage = procRequest(URLSym, 1, False)  # need to append a letter 'A'->'Z'
-        mwPage = mwReducePage(mwPage)
-        mwBuildFunds(mwPage, fundList)
-
+        ltrCount+= 1
+        fundList = getETFListings(letter, URL, fundList)
+        
     # Do 0-9 now...
     drawProgressBar(ltrCount+1/(len(ascii_lowercase)+1))
-    URLSym = URL + '0-9'
-    mwPage = procRequest(URLSym, 1, False)
-    mwPage = mwReducePage(mwPage)
-    mwBuildFunds(mwPage, fundList)
+    fundList = getETFListings('0-9', URL, fundList)
 
     cols = ['Name', 'Symbol', 'Country', 'Exchange', 'Sector'] # need more
     seralizeData(filename, fundList, cols)      # Seralize data
