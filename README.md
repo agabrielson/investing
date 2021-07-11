@@ -42,7 +42,8 @@ Runable python scripts:
   * stocksQuartely.py: Pull longer term stock data points together for all stocks (US market)
   * getHolders.py: Get the top 10 list of holders for a company 
 * ETFs (in progress)
-  * getAllETFs.py: Get a list of existing ETFs with descriptions, can be used to build the table needed for other ETF scripts.
+  * getAllETFs.py: Get a list of existing ETFs with descriptions, can be used to build the table needed for other ETF scripts. Output can be used to generate SymbolsETF.csv
+  * quartelyETFMetrics.py: Pull longer term data points together that can be extremely time consuming. Note: ETFs have less data points than Mutual Funds
 
 Examples calls are located in the header of each python file mentioned above
 
