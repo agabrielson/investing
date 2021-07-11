@@ -97,8 +97,8 @@ def yfGetQuarterlyMetrics(symbol):
 # Lookup quartely metrics
 #   No one source has everything
 def quarterlyMetric(filename):
-    #symbols = readFunds('SymbolsETF.csv')      #Get symbols of interest
-    symbols = readFunds('SymbolsETFDebug.csv')
+    symbols = readFunds('SymbolsETF.csv')      #Get symbols of interest
+    #symbols = readFunds('SymbolsETFDebug.csv')
     
     # Sort symbols & remove duplicates
     sortSymbols(symbols)
