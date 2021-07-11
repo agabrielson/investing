@@ -103,5 +103,5 @@ def seralizeData(filename, dataList, cols = None):
 # Read in the symbols of interest
 # Maintaining a structure has become unwieldy... Reading in a simple spreadsheet is easier.
 def readFunds(filename):
-	symbols = pd.read_csv(filename, index_col=0, dtype={'Name': str}) 
+	symbols = pd.read_csv(filename, index_col=0, dtype={'Name': str}, header=None) 
 	return symbols
