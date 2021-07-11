@@ -32,6 +32,9 @@ def mwProcData(fullPage, searchStr):
     redPage = fullPage[tableLoc:]
     reduced = redPage.splitlines()
 
+    if (len(reduced) == 1):
+        return None
+
     return reduced[1]
 
 def mwGetKeyData(fullPage): 
@@ -45,7 +48,7 @@ def mwGetKeyData(fullPage):
     yrAvgRtnVal = mwProcData(fullPage[tableLoc:], '52 Week Avg Return')
 
     mwKeyDataList = [yrRangeVal, totAssetVal, fiveYrVal, yieldVal, expenseRatioVal, turnoverVal, yrAvgRtnVal]
-    mwKeyDataHdr = ['52 Week Range', '5 Year', 'Total Net Assets', 'Yield',
+    mwKeyDataHdr = ['52 Week Range', 'Total Net Assets', '5 Year', 'Yield',
                     'Net Expense Ratio', 'Turnover %', '52 Week Avg Return']
     return mwKeyDataList, mwKeyDataHdr
 
