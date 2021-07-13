@@ -14,13 +14,18 @@
 #   0.1     210711      Initial Functionality
 #   0.11    210713      Reducing depends - YF.Ticker() has issues with ETFs, few show up...
 
-#import yfinance as yf
 import pandas as pd
 import itertools 
-#import requests
 from datetime import date
 from InvestingBase import readFunds, procRequest, getDate, sortSymbols, seralizeData
 
+# mwProcData: Extract values of interest from a scraped webpage
+#   This function is a bit targetted for MarketWatch
+# Inputs
+#   fullPage: page to look through
+#   searchStr: string to find
+# Returns
+#   Value right after the search string
 def mwProcData(fullPage, searchStr):
     tableLoc = fullPage.find(searchStr)
     redPage = fullPage[tableLoc:]
@@ -31,7 +36,13 @@ def mwProcData(fullPage, searchStr):
 
     return reduced[1]
 
-def mwGetName(fullPage, symbol):
+# mwGetName: Determine if ETF is open and locate full name
+# Inputs
+#   fullPage: page to look through
+# Returns
+#   nameLong: Long name of ETF
+#   closed: True if closed/False if open
+def mwGetName(fullPage):
     closed = False
 
     fp = fullPage.splitlines()
@@ -47,6 +58,12 @@ def mwGetName(fullPage, symbol):
 
     return nameLong, closed
 
+# mwGetKeyData: Extract the info from the key data table
+# Inputs
+#   fullPage: page to look through
+# Returns
+#   mwKeyDataList: The data points of interest from the table
+#   mwKeyDataHdr: Header data for points of interest
 def mwGetKeyData(fullPage): 
     tableLoc = fullPage.find('Key Data')
     yrRangeVal = mwProcData(fullPage[tableLoc:], '52 Week Range')
@@ -64,6 +81,14 @@ def mwGetKeyData(fullPage):
 
     return mwKeyDataList, mwKeyDataHdr
 
+# dbProcData: Extract values of interest from a scraped webpage
+#   This function is a bit targetted for etfdb
+# Inputs
+#   fullPage: page to look through
+#   searchStrS: string before data point of interest
+#   searchStrE: string after data point of interest
+# Returns
+#   Value between the two search strings
 def dbProcData(fullPage, searchStrS, searchStrE):
     tableLocSrt = fullPage.find(searchStrS)+len(searchStrS)
     tableLocEnd = fullPage.find(searchStrE)
@@ -75,6 +100,12 @@ def dbProcData(fullPage, searchStrS, searchStrE):
 
     return reduced[1]
 
+# dbGetKeyData1: Extract the data points of interest
+# Inputs
+#   fullPage: page to look through
+# Returns
+#   dbKeyDataList: The data points of interest from the table
+#   dbKeyDataHdr: Header data for points of interest
 def dbGetKeyData1(fullPage):
     ytdRtn = dbProcData(fullPage, '26 Week Return', 'Year to Date Return')
     rtn1yr = dbProcData(fullPage, 'Year to Date Return', '1 Year Return')
@@ -86,6 +117,13 @@ def dbGetKeyData1(fullPage):
 
     return dbKeyDataList, dbKeyDataHdr
 
+# dbGetKeyData2: Extract the data points of interest
+#   Note: this is a different website than dbGetKeyData1
+# Inputs
+#   fullPage: page to look through
+# Returns
+#   dbKeyDataList: The data points of interest from the table
+#   dbKeyDataHdr: Header data for points of interest
 def dbGetKeyData2(fullPage):
     tableLoc = fullPage.find('Investment Themes')
     cat = dbProcData(fullPage[tableLoc:], 'Category', 'Asset Class')
@@ -117,11 +155,6 @@ def quarterlyETFMetric(filename):
 
     dateToday = date.today().strftime('%Y-%m-%d')
     count = True            # Build header
-    
-    #agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'
-    #header = requests.utils.default_headers()
-    #header['User-Agent'] = agent;
-    #print(headers)
 
     for symbol in symbols.index:  # lookup data
         print(symbol)
@@ -130,15 +163,15 @@ def quarterlyETFMetric(filename):
         DB2_URLSym= DB_URL_p1 + symbol.strip() + DB_URL_p3
         
         try:
-            mwPage = procRequest(MW_URLSym, 5, True, allow_redirects=True)
-            nameLong, closed = mwGetName(mwPage, symbol)
+            mwPage = procRequest(MW_URLSym)
+            nameLong, closed = mwGetName(mwPage)
             if(closed is False):
                 mwKeyDataList, mwKeyDataHdr = mwGetKeyData(mwPage)
             
-                dbPage = procRequest(DB1_URLSym, 5, True, allow_redirects=True)
+                dbPage = procRequest(DB1_URLSym)
                 dbKeyDataList1, dbKeyDataHdr1 = dbGetKeyData1(dbPage)
 
-                dbPage = procRequest(DB2_URLSym, 5, True, allow_redirects=True)
+                dbPage = procRequest(DB2_URLSym)
                 dbKeyDataList2, dbKeyDataHdr2 = dbGetKeyData2(dbPage)
 
                 symList = list(itertools.chain([dateToday], [symbol], [nameLong], mwKeyDataList, dbKeyDataList1, dbKeyDataList2))
