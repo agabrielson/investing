@@ -35,28 +35,28 @@ def extractTicker(stocksJson):
 #   We are only interested in the table with holdings information
 #	Try a few times if a URL has an issue...
 def procRequest(URLSym, iter = 5, reducedText = True, **kwargs):
+	
+	if(iter == 0):	# Website is having issues...
+		return ' '
 
-    if(iter == 0):	# Website is having issues...
-    	return ' '
-
-    page = requests.get(URLSym, **kwargs)
+	page = requests.get(URLSym, **kwargs)
     
-    # If the webpage is having issues, try again...
-    if(page.ok == False):
-    	print("URL Failed... Trying again")
-    	time.sleep(0.2)
-    	return procRequest(URLSym, iter-1, reducedText, **kwargs)
+	# If the webpage is having issues, try again...
+	if(page.ok == False):
+		print("URL Failed... Trying again")
+		time.sleep(0.2)
+		return procRequest(URLSym, iter-1, reducedText, **kwargs)
 
-    soup = BeautifulSoup(page.content, 'html.parser')
-    if(reducedText == True):
-    	fullPage = soup.get_text()
-    else:
-    	fullPage = soup.prettify()
+	soup = BeautifulSoup(page.content, 'html.parser')
+	if(reducedText == True):
+		fullPage = soup.get_text()
+	else:
+		fullPage = soup.prettify()
 
     #Remove space
-    fullPage = re.sub(r'\n\s*\n', '\n', fullPage, flags=re.MULTILINE)
+	fullPage = re.sub(r'\n\s*\n', '\n', fullPage, flags=re.MULTILINE)
 
-    return fullPage
+	return fullPage
 
 # Verify month and year are sane
 def startMonthYear(month, year):

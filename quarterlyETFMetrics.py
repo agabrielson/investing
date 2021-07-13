@@ -12,10 +12,12 @@
 #      
 # Rev History:
 #   0.1     210711      Initial Functionality
+#   0.11    210713      Reducing depends - YF.Ticker() has issues with ETFs, few show up...
 
-import yfinance as yf
+#import yfinance as yf
 import pandas as pd
 import itertools 
+#import requests
 from datetime import date
 from InvestingBase import readFunds, procRequest, getDate, sortSymbols, seralizeData
 
@@ -28,6 +30,22 @@ def mwProcData(fullPage, searchStr):
         return None
 
     return reduced[1]
+
+def mwGetName(fullPage, symbol):
+    closed = False
+
+    fp = fullPage.splitlines()
+    nameLong = fp[1]
+    totStrStart = nameLong.find('|')+2
+    nameLong = nameLong[totStrStart:]
+    totStrEnd = nameLong.find('Overview')-1
+    nameLong = nameLong[:totStrEnd]
+
+    NAVDate = mwProcData(fullPage, 'NAV Date')
+    if(NAVDate == 'N/A'):
+        closed = True
+
+    return nameLong, closed
 
 def mwGetKeyData(fullPage): 
     tableLoc = fullPage.find('Key Data')
@@ -79,26 +97,11 @@ def dbGetKeyData2(fullPage):
 
     return dbKeyDataList, dbKeyDataHdr
 
-def yfGetQuarterlyMetrics(symbol):
-    sym = yf.Ticker(symbol)
-    
-    sName = sym.info['symbol']
-    lName = sym.info['longName']
-
-    totAssets = sym.info['totalAssets']
-    yieldVal = sym.info['yield']
-    trailYield = sym.info['trailingAnnualDividendYield']
-
-    yfDataList = [sName, lName, totAssets, yieldVal, trailYield]
-    yfDataHdr = ['Symbol', 'Name', 'Total Assets', 'yield', 'Trailing Annual Dividend Yield']
-
-    return yfDataList, yfDataHdr
-
 # Lookup quartely metrics
 #   No one source has everything
-def quarterlyMetric(filename):
-    #symbols = readFunds('SymbolsETF.csv')      #Get symbols of interest
-    symbols = readFunds('SymbolsETFDebug.csv')
+def quarterlyETFMetric(filename):
+    symbols = readFunds('SymbolsETF.csv')      #Get symbols of interest
+    #symbols = readFunds('SymbolsETFDebug.csv')
     
     # Sort symbols & remove duplicates
     sortSymbols(symbols)
@@ -115,30 +118,37 @@ def quarterlyMetric(filename):
     dateToday = date.today().strftime('%Y-%m-%d')
     count = True            # Build header
     
+    #agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'
+    #header = requests.utils.default_headers()
+    #header['User-Agent'] = agent;
+    #print(headers)
+
     for symbol in symbols.index:  # lookup data
         print(symbol)
-        MW_URLSym = MW_URL + symbol
-        DB1_URLSym= DB_URL_p1 + symbol + DB_URL_p2
-        DB2_URLSym= DB_URL_p1 + symbol + DB_URL_p3
+        MW_URLSym = MW_URL + symbol.strip()
+        DB1_URLSym= DB_URL_p1 + symbol.strip() + DB_URL_p2
+        DB2_URLSym= DB_URL_p1 + symbol.strip() + DB_URL_p3
         
         try:
-            yfData, yfDataHdr = yfGetQuarterlyMetrics(symbol)
+            mwPage = procRequest(MW_URLSym, 5, True, allow_redirects=True)
+            nameLong, closed = mwGetName(mwPage, symbol)
+            if(closed is False):
+                mwKeyDataList, mwKeyDataHdr = mwGetKeyData(mwPage)
             
-            mwPage = procRequest(MW_URLSym, 5, True, allow_redirects=False)
-            mwKeyDataList, mwKeyDataHdr = mwGetKeyData(mwPage)
+                dbPage = procRequest(DB1_URLSym, 5, True, allow_redirects=True)
+                dbKeyDataList1, dbKeyDataHdr1 = dbGetKeyData1(dbPage)
 
-            dbPage = procRequest(DB1_URLSym, 5, True, allow_redirects=False)
-            dbKeyDataList1, dbKeyDataHdr1 = dbGetKeyData1(dbPage)
+                dbPage = procRequest(DB2_URLSym, 5, True, allow_redirects=True)
+                dbKeyDataList2, dbKeyDataHdr2 = dbGetKeyData2(dbPage)
 
-            dbPage = procRequest(DB2_URLSym, 5, True, allow_redirects=False)
-            dbKeyDataList2, dbKeyDataHdr2 = dbGetKeyData2(dbPage)
-
-            symList = list(itertools.chain([dateToday], yfData, mwKeyDataList, dbKeyDataList1, dbKeyDataList2))
-            dataList.append(symList)
+                symList = list(itertools.chain([dateToday], [symbol], [nameLong], mwKeyDataList, dbKeyDataList1, dbKeyDataList2))
+                dataList.append(symList)
+            else:
+                dataList.append([dateToday, symbol, 'closed'])
 
             if(count == True):
                 count = False
-                hdrList = list(itertools.chain(['Date'], yfDataHdr, mwKeyDataHdr, dbKeyDataHdr1, dbKeyDataHdr2))
+                hdrList = list(itertools.chain(['Date'], ['Symbol'], ['Long Name'], mwKeyDataHdr, dbKeyDataHdr1, dbKeyDataHdr2))
         except (IndexError, KeyError):
             dataList.append([dateToday, symbol])
 
@@ -151,4 +161,4 @@ if __name__ == "__main__":
     if(len(sys.argv) == 2):
         filename = sys.argv[1]
 
-    quarterlyMetric(filename)
+    quarterlyETFMetric(filename)
