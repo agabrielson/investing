@@ -97,8 +97,8 @@ def yfGetQuarterlyMetrics(symbol):
 # Lookup quartely metrics
 #   No one source has everything
 def quarterlyMetric(filename):
-    symbols = readFunds('SymbolsETF.csv')      #Get symbols of interest
-    #symbols = readFunds('SymbolsETFDebug.csv')
+    #symbols = readFunds('SymbolsETF.csv')      #Get symbols of interest
+    symbols = readFunds('SymbolsETFDebug.csv')
     
     # Sort symbols & remove duplicates
     sortSymbols(symbols)
@@ -120,17 +120,17 @@ def quarterlyMetric(filename):
         MW_URLSym = MW_URL + symbol
         DB1_URLSym= DB_URL_p1 + symbol + DB_URL_p2
         DB2_URLSym= DB_URL_p1 + symbol + DB_URL_p3
-
+        
         try:
             yfData, yfDataHdr = yfGetQuarterlyMetrics(symbol)
             
-            mwPage = procRequest(MW_URLSym)
+            mwPage = procRequest(MW_URLSym, 5, True, allow_redirects=False)
             mwKeyDataList, mwKeyDataHdr = mwGetKeyData(mwPage)
 
-            dbPage = procRequest(DB1_URLSym)
+            dbPage = procRequest(DB1_URLSym, 5, True, allow_redirects=False)
             dbKeyDataList1, dbKeyDataHdr1 = dbGetKeyData1(dbPage)
 
-            dbPage = procRequest(DB2_URLSym)
+            dbPage = procRequest(DB2_URLSym, 5, True, allow_redirects=False)
             dbKeyDataList2, dbKeyDataHdr2 = dbGetKeyData2(dbPage)
 
             symList = list(itertools.chain([dateToday], yfData, mwKeyDataList, dbKeyDataList1, dbKeyDataList2))

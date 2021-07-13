@@ -34,18 +34,18 @@ def extractTicker(stocksJson):
 # Make a request and start to reduce the string
 #   We are only interested in the table with holdings information
 #	Try a few times if a URL has an issue...
-def procRequest(URLSym, iter = 5, reducedText = True):
+def procRequest(URLSym, iter = 5, reducedText = True, **kwargs):
 
     if(iter == 0):	# Website is having issues...
-    	return " "
+    	return ' '
 
-    page = requests.get(URLSym)
+    page = requests.get(URLSym, **kwargs)
     
     # If the webpage is having issues, try again...
     if(page.ok == False):
     	print("URL Failed... Trying again")
     	time.sleep(0.2)
-    	return procRequest(URLSym, iter-1, reducedText)
+    	return procRequest(URLSym, iter-1, reducedText, **kwargs)
 
     soup = BeautifulSoup(page.content, 'html.parser')
     if(reducedText == True):
