@@ -17,7 +17,7 @@
 import pandas as pd
 import itertools 
 from datetime import date
-from InvestingBase import readFunds, procRequest, getDate, sortSymbols, seralizeData
+from InvestingBase import readFunds, procRequest, getDate, sortSymbols, seralizeData, stripHTML
 
 # mwProcData: Extract values of interest from a scraped webpage
 #   This function is a bit targetted for MarketWatch
@@ -81,7 +81,7 @@ def mwGetKeyData(fullPage):
 
     return mwKeyDataList, mwKeyDataHdr
 
-# dbProcData: Extract values of interest from a scraped webpage
+# yfProcData: Extract values of interest from a scraped webpage
 #   This function is a bit targetted for etfdb
 # Inputs
 #   fullPage: page to look through
@@ -89,51 +89,78 @@ def mwGetKeyData(fullPage):
 #   searchStrE: string after data point of interest
 # Returns
 #   Value between the two search strings
-def dbProcData(fullPage, searchStrS, searchStrE):
+def yfProcData(fullPage, searchStrS, searchStrE):
     tableLocSrt = fullPage.find(searchStrS)+len(searchStrS)
-    tableLocEnd = fullPage.find(searchStrE)
-    redPage = fullPage[tableLocSrt:tableLocEnd]
-    reduced = redPage.splitlines()
+    redPage = fullPage[tableLocSrt:]
 
-    if (len(reduced) == 1):
-        return None
+    tableLocEnd = redPage.find(searchStrE)
+    redPage = redPage[:tableLocEnd]
 
-    return reduced[1]
+    #print('yfDP: ' + str(tableLocSrt) + ' ' + str(tableLocEnd))
+    #print('Search Start: ' + searchStrS)
+    #print('Search End: ' + searchStrE)
+    #print(fullPage)
+    #print(fullPage[tableLocSrt:])
+    #print('yfRet: ' + redPage)
 
-# dbGetKeyData1: Extract the data points of interest
+    return redPage.strip()
+
+# yfPerformance: Extract the data points of interest
 # Inputs
 #   fullPage: page to look through
 # Returns
-#   dbKeyDataList: The data points of interest from the table
+#   yfKeyDataList: The data points of interest from the table
 #   dbKeyDataHdr: Header data for points of interest
-def dbGetKeyData1(fullPage):
-    ytdRtn = dbProcData(fullPage, '26 Week Return', 'Year to Date Return')
-    rtn1yr = dbProcData(fullPage, 'Year to Date Return', '1 Year Return')
-    rtn3yr = dbProcData(fullPage, '1 Year Return', '3 Year Return')
-    rtn5yr = dbProcData(fullPage, '3 Year Return', '5 Year Return')
+def yfPerformance(fullPage):
+    tableLocS = fullPage.find('Vs. Benchmarks')
+    fp = fullPage[tableLocS:]
+    tableLocE = fp.find('Annual Total Return')
+    fp = fp[:tableLocE]
+    fp = stripHTML(fp)
+    entry = ' '.join([str(elem) for elem in fp])
 
-    dbKeyDataList = [ytdRtn, rtn1yr, rtn3yr, rtn5yr]
-    dbKeyDataHdr = ['YTD Rtn', '1 Yr Rtn', '3 Yr Rtn', '5 Yr Rtn']
+    ytdRtn = yfProcData(entry, 'YTD', '%')
+    rtn1yr = yfProcData(entry, '1-Year', '%')
+    rtn3yr = yfProcData(entry, '3-Year', '%')
+    rtn5yr = yfProcData(entry, '5-Year', '%')
 
-    return dbKeyDataList, dbKeyDataHdr
+    yfPerfDataList = [ytdRtn, rtn1yr, rtn3yr, rtn5yr]
+    yfPerfDataHdr = ['YTD Rtn', '1 Yr Rtn', '3 Yr Rtn', '5 Yr Rtn']
 
-# dbGetKeyData2: Extract the data points of interest
-#   Note: this is a different website than dbGetKeyData1
+    return yfPerfDataList, yfPerfDataHdr
+
+# yfProfile: Extract the data points of interest
 # Inputs
 #   fullPage: page to look through
 # Returns
-#   dbKeyDataList: The data points of interest from the table
-#   dbKeyDataHdr: Header data for points of interest
-def dbGetKeyData2(fullPage):
-    tableLoc = fullPage.find('Investment Themes')
-    cat = dbProcData(fullPage[tableLoc:], 'Category', 'Asset Class')
-    aClass = dbProcData(fullPage[tableLoc:], 'Asset Class', 'Asset Class Size')
-    classSz = dbProcData(fullPage[tableLoc:], 'Asset Class Size', 'Asset Class Style<')
+#   yfProData: The data points of interest from the table
+#   yfProDataHdr: Header data for points of interest
+def yfProfile(fullPage):
+    tableLocS = fullPage.find('Fund Overview')+len('Fund Overview')
+    fp = fullPage[tableLocS:]
+    tableLocE = fp.find('Fund Operations')+len('Fund Operations')
+    fp = fullPage[tableLocS:]
+    fp = fp[:tableLocE]
+    fp = stripHTML(fp)
+    entry = ' '.join([str(elem) for elem in fp]) 
 
-    dbKeyDataList = [cat, aClass, classSz]
-    dbKeyDataHdr = ['Category', 'Asset Class', 'Asset Class Size']
+    cat = yfProcData(entry, 'Category', 'Fund Family')
+    classSz = yfProcData(entry, 'Net Assets', 'YTD Daily Total Return')
 
-    return dbKeyDataList, dbKeyDataHdr
+    tableLocS = fullPage.find('Fund Operations')+len('Fund Operations')
+    fp = fullPage[tableLocS:]
+    tableLocE = fp.find('Total Net Assets')+len('Total Net Assets')
+    fp = fullPage[tableLocS:]
+    fp = fp[:tableLocE]
+    fp = stripHTML(fp)
+    entry = ' '.join([str(elem) for elem in fp]) 
+
+    turnover = yfProcData(entry, 'Holdings Turnover', '%')
+
+    yfProData = [cat, classSz, turnover]
+    yfProDataHdr = ['Category', 'Asset Class Size', 'Turnover']
+
+    return yfProData, yfProDataHdr
 
 # Lookup quartely metrics
 #   No one source has everything
@@ -146,9 +173,9 @@ def quarterlyETFMetric(filename):
 
     # String to locate fund holdings
     MW_URL = 'https://www.marketwatch.com/investing/fund/'
-    DB_URL_p1 = 'https://etfdb.com/etf/'
-    DB_URL_p2 = '/#performance'
-    DB_URL_p3 = '/#etf-ticker-profile'
+    YF_URL_p1 = 'https://finance.yahoo.com/quote/'
+    YF_URL_p2 = '/performance'
+    YF_URL_p3 = '/profile'
 
     dataList = []           # Allocate list to hold data
     hdrList = []            # Allocate list to hold header
@@ -156,32 +183,42 @@ def quarterlyETFMetric(filename):
     dateToday = date.today().strftime('%Y-%m-%d')
     count = True            # Build header
 
+    headers = { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36' } 
+
     for symbol in symbols.index:  # lookup data
         print(symbol)
         MW_URLSym = MW_URL + symbol.strip()
-        DB1_URLSym= DB_URL_p1 + symbol.strip() + DB_URL_p2
-        DB2_URLSym= DB_URL_p1 + symbol.strip() + DB_URL_p3
+        YF1_URLSym= YF_URL_p1 + symbol.strip() + YF_URL_p2
+        YF2_URLSym= YF_URL_p1 + symbol.strip() + YF_URL_p3
         
+        # Prealloc storage variables
+        mwKeyDataList = '' 
+        mwKeyDataHdr = ''
+        yfPerfData = ''
+        yfPerfDataHdr = ''
+        yfProData = ''
+        yfProDataHdr = ''
+
         try:
             mwPage = procRequest(MW_URLSym)
             nameLong, closed = mwGetName(mwPage)
             if(closed is False):
                 mwKeyDataList, mwKeyDataHdr = mwGetKeyData(mwPage)
             
-                dbPage = procRequest(DB1_URLSym)
-                dbKeyDataList1, dbKeyDataHdr1 = dbGetKeyData1(dbPage)
+                yfPage = procRequest(YF1_URLSym, 5, False, headers=headers)
+                yfPerfData, yfPerfDataHdr = yfPerformance(yfPage)
 
-                dbPage = procRequest(DB2_URLSym)
-                dbKeyDataList2, dbKeyDataHdr2 = dbGetKeyData2(dbPage)
+                yfPage = procRequest(YF2_URLSym, 5, False, headers=headers)
+                yfProData, yfProDataHdr = yfProfile(yfPage)
 
-                symList = list(itertools.chain([dateToday], [symbol], [nameLong], mwKeyDataList, dbKeyDataList1, dbKeyDataList2))
+                symList = list(itertools.chain([dateToday], [symbol], [nameLong], mwKeyDataList, yfPerfData, yfProData))
                 dataList.append(symList)
             else:
                 dataList.append([dateToday, symbol, 'closed'])
 
             if(count == True):
                 count = False
-                hdrList = list(itertools.chain(['Date'], ['Symbol'], ['Long Name'], mwKeyDataHdr, dbKeyDataHdr1, dbKeyDataHdr2))
+                hdrList = list(itertools.chain(['Date'], ['Symbol'], ['Long Name'], mwKeyDataHdr, yfPerfDataHdr, yfProDataHdr))
         except (IndexError, KeyError):
             dataList.append([dateToday, symbol])
 
