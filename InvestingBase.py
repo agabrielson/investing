@@ -57,10 +57,14 @@ def procRequest(URLSym, iter = 5, reducedText = True, **kwargs):
 	if(iter == 0):	# Website is having issues...
 		return ' '
 
-	page = requests.get(URLSym, **kwargs)
-    
+	fail = False
+	try:
+		page = requests.get(URLSym, **kwargs)
+	except (ConnectionResetError):
+		fail = True
+
 	# If the webpage is having issues, try again...
-	if(page.ok == False):
+	if(page.ok == False or fail == True):
 		print("URL Failed... Trying again")
 		#print(page)
 		time.sleep(0.2)
