@@ -8,6 +8,7 @@
 #	0.2		210426		Add procRequest & standardize
 #	0.21	210426		Start checking procRequest for errors
 #	0.35	210501		Add enhanced symbol input; updated symbols to pandas dataframe
+#	0.36	210714		Add stripHTML (from getAllETFs.py)
 
 from datetime import date
 import time
@@ -31,6 +32,23 @@ def extractTicker(stocksJson):
 
 	return symList
 
+#Strip HTML tags
+def stripHTML(entry):
+    # Remove remaining html tags
+    strippedEntry = []
+    if type(entry) is not str: 
+        #print(entry)
+        entry = ' '.join([str(elem) for elem in entry])
+
+    for line in entry.splitlines(True):
+        line = line.lstrip()
+        if not (line.startswith('<')):
+            strippedEntry.append(line.rstrip('\n'))
+
+    strippedEntry[1] = strippedEntry[1][1:-1]
+
+    return strippedEntry
+    
 # Make a request and start to reduce the string
 #   We are only interested in the table with holdings information
 #	Try a few times if a URL has an issue...
@@ -44,6 +62,7 @@ def procRequest(URLSym, iter = 5, reducedText = True, **kwargs):
 	# If the webpage is having issues, try again...
 	if(page.ok == False):
 		print("URL Failed... Trying again")
+		#print(page)
 		time.sleep(0.2)
 		return procRequest(URLSym, iter-1, reducedText, **kwargs)
 

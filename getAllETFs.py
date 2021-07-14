@@ -21,7 +21,7 @@ import requests
 import re
 
 from string import ascii_lowercase
-from InvestingBase import procRequest, seralizeData
+from InvestingBase import procRequest, seralizeData, stripHTML
 
 # Found on StackOverflow
 # percent float from 0 to 1. 
@@ -29,25 +29,6 @@ def drawProgressBar(percent, barLen = 20):
     sys.stdout.write("\r")
     sys.stdout.write("[{:<{}}] {:.0f}%".format("=" * int(barLen * percent), barLen, percent * 100))
     sys.stdout.flush()
-
-def stripHTML(entry):
-    # Remove remaining html tags
-    strippedEntry = []
-    if type(entry) is not str: 
-        print(entry)
-        entry = ' '.join([str(elem) for elem in entry])
-
-    for line in entry.splitlines(True):
-        line = line.lstrip()
-        if not (line.startswith('<')):
-            strippedEntry.append(line.rstrip('\n'))
-
-    strippedEntry[1] = strippedEntry[1][1:-1]
-    
-    print(strippedEntry[1])
-
-    return strippedEntry
-
 
 # We have a table with symbols and descriptions
 #   add to an existing list
@@ -120,8 +101,10 @@ def allMutualFunds(filename):
         fundList = getETFListings(letter, URL, fundList)
         
     # Do 0-9 now...
-    drawProgressBar(ltrCount+1/(len(ascii_lowercase)+1))
+    drawProgressBar(.99)
     fundList = getETFListings('0-9', URL, fundList)
+    drawProgressBar(1)
+    print('')
 
     cols = ['Name', 'Symbol', 'Country', 'Exchange', 'Sector'] # need more
     seralizeData(filename, fundList, cols)      # Seralize data
