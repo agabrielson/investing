@@ -9,6 +9,7 @@
 #	0.21	210426		Start checking procRequest for errors
 #	0.35	210501		Add enhanced symbol input; updated symbols to pandas dataframe
 #	0.36	210714		Add stripHTML (from getAllETFs.py)
+#	0.37	210724		Moving mwGetName, mwProcData from quarterlyETFMetrics
 
 from datetime import date
 import time
@@ -128,3 +129,42 @@ def seralizeData(filename, dataList, cols = None):
 def readFunds(filename):
 	symbols = pd.read_csv(filename, index_col=0, dtype={'Name': str}, header=None) 
 	return symbols
+
+# mwProcData: Extract values of interest from a scraped webpage
+#   This function is a bit targetted for MarketWatch
+# Inputs
+#   fullPage: page to look through
+#   searchStr: string to find
+# Returns
+#   Value right after the search string
+def mwProcData(fullPage, searchStr):
+    tableLoc = fullPage.find(searchStr)
+    redPage = fullPage[tableLoc:]
+    reduced = redPage.splitlines()
+
+    if (len(reduced) == 1):
+        return None
+
+    return reduced[1]
+
+# mwGetName: Determine if ETF is open and locate full name
+# Inputs
+#   fullPage: page to look through
+# Returns
+#   nameLong: Long name of ETF
+#   closed: True if closed/False if open
+def mwGetName(fullPage):
+    closed = False
+
+    fp = fullPage.splitlines()
+    nameLong = fp[1]
+    totStrStart = nameLong.find('|')+2
+    nameLong = nameLong[totStrStart:]
+    totStrEnd = nameLong.find('Overview')-1
+    nameLong = nameLong[:totStrEnd]
+
+    NAVDate = mwProcData(fullPage, 'NAV Date')
+    if(NAVDate == 'N/A'):
+        closed = True
+
+    return nameLong, closed

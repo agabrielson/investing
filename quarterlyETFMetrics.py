@@ -13,50 +13,12 @@
 # Rev History:
 #   0.1     210711      Initial Functionality
 #   0.11    210713      Reducing depends - YF.Ticker() has issues with ETFs, few show up...
+#   0.15    210724      Moving mwGetName to InvestingBase
 
 import pandas as pd
 import itertools 
 from datetime import date
-from InvestingBase import readFunds, procRequest, getDate, sortSymbols, seralizeData, stripHTML
-
-# mwProcData: Extract values of interest from a scraped webpage
-#   This function is a bit targetted for MarketWatch
-# Inputs
-#   fullPage: page to look through
-#   searchStr: string to find
-# Returns
-#   Value right after the search string
-def mwProcData(fullPage, searchStr):
-    tableLoc = fullPage.find(searchStr)
-    redPage = fullPage[tableLoc:]
-    reduced = redPage.splitlines()
-
-    if (len(reduced) == 1):
-        return None
-
-    return reduced[1]
-
-# mwGetName: Determine if ETF is open and locate full name
-# Inputs
-#   fullPage: page to look through
-# Returns
-#   nameLong: Long name of ETF
-#   closed: True if closed/False if open
-def mwGetName(fullPage):
-    closed = False
-
-    fp = fullPage.splitlines()
-    nameLong = fp[1]
-    totStrStart = nameLong.find('|')+2
-    nameLong = nameLong[totStrStart:]
-    totStrEnd = nameLong.find('Overview')-1
-    nameLong = nameLong[:totStrEnd]
-
-    NAVDate = mwProcData(fullPage, 'NAV Date')
-    if(NAVDate == 'N/A'):
-        closed = True
-
-    return nameLong, closed
+from InvestingBase import readFunds, procRequest, getDate, sortSymbols, seralizeData, stripHTML, mwGetName, mwProcData
 
 # mwGetKeyData: Extract the info from the key data table
 # Inputs
