@@ -223,7 +223,7 @@ def getHoldings(investType, filename, month, year):
 		holdings = " "
 		holdings, hDictSub, asOf, closed = buildHoldings(pageProc, symbol)
 		if(closed == True):
-			print('closed')
+			#print('closed')
 			strList = [symbol] + ['closed']
 		else:
 			holdingsDict.update(hDictSub)	#Merge dictionaries - one lookup
