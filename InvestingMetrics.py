@@ -43,8 +43,8 @@ def getMetrics(symbol, month, year):
 
         metricsList = [symbol, dayFirst, dayEnd, dayEnd/dayFirst]
     except (IndexError, ValueError):
-        print("Unexpected error:", sys.exc_info()[0])
-        metricsList = [symbol, " ", " ", " "]
+        #print("Unexpected error:", sys.exc_info()[0])
+        metricsList = [symbol, "closed", " ", " "]
 
     #intermediate values for debugging
     getMetrics.start = start
