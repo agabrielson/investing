@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# quartelyMetrics.py
+# quartelyFundMetrics.py
 #
 # Inputs
 #   filename:   spreadsheet to output data, can be left blank
 #
 # Examples
-#   python3 quartelyMetrics.py              -> outputs in quarterlySymbols.xlsx
-#   python3 quartelyMetrics.py data.xlsx    -> outputs in data.xlsx
+#   python3 quartelyFundMetrics.py              -> outputs in quarterlyFundSym.xlsx
+#   python3 quartelyFundMetrics.py data.xlsx    -> outputs in data.xlsx
 #      
 # Rev History:
 #   0.1     210303      Initial Functionality
@@ -20,6 +20,7 @@
 #                       Added significant number of fields
 #                       Moving procRequest to InvestingBase
 #   0.35    210501      Enhance symbol input
+#   0.4     210726      Renamed for clarity
 
 import yfinance as yf
 import pandas as pd
@@ -108,7 +109,7 @@ def yfGetQuarterlyMetrics(symbol):
 #   Some of the yahoo data appears to be suspect
 #   Going to pull suspect and missing data points from MarketWatch
 #   Then merge the two data sources
-def quarterlyMetric(filename):
+def quartelyFundMetrics(filename):
     symbols = readFunds('Symbols.csv')      #Get symbols of interest
     #symbols = readFunds('SymbolsDebug.csv')
     
@@ -151,8 +152,8 @@ def quarterlyMetric(filename):
 
 if __name__ == "__main__":
     import sys
-    filename = 'quarterlySymbols.xlsx'
+    filename = 'quarterlyFundSym.xlsx'
     if(len(sys.argv) == 2):
         filename = sys.argv[1]
 
-    quarterlyMetric(filename)
+    quartelyFundMetrics(filename)
