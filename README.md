@@ -36,7 +36,7 @@ Runable python scripts:
   * getAllMutualFunds.py: Get a list of existing mutual funds and descriptions, can be used to build the table needed for other fund scripts.
   * monthlyMetrics.py: Collect monthly pricing data for funds of interest. Most pricing services provide limited granularity.
   * quartelyMetrics.py: Pull longer term data points together that can be extremely time consuming.
-  * getHoldings.py: Extract fund holdings and attempt to get monthly return
+  * getHoldings.py: Extract fund or ETF holdings and attempt to get monthly return
 * Stocks
   * getStocks.py: Get monthly stock returns for all stocks (US market)
   * stocksQuartely.py: Pull longer term stock data points together for all stocks (US market)

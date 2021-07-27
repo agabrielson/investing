@@ -163,6 +163,9 @@ def mwGetName(fullPage):
     totStrEnd = nameLong.find('Overview')-1
     nameLong = nameLong[:totStrEnd]
 
+    #if(fullPage.find('closed')):
+    #	closed = True
+
     NAVDate = mwProcData(fullPage, 'NAV Date')
     if(NAVDate == 'N/A'):
         closed = True
